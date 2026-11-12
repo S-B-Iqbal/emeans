@@ -21,7 +21,13 @@
 - `gh` 2.100.0 authenticated as `S-B-Iqbal`; token scopes `gist, read:org, repo, workflow`
   (no `project`, so no GitHub Projects; tracking uses issues, D-033).
 - CI: `.github/workflows/tests.yml` (ubuntu-latest, py3.10) runs on every push; the full matrix
-  arrives in Phase 5 (D-034).
+  arrives in Phase 5 (D-034). It tests **both** install paths: wheel (`pip install ".[test]"`) and
+  editable with non-isolated build deps.
+- Gotcha (hit on the first CI run): a meson-python editable install performed **with** build
+  isolation breaks at import time — the editable loader rebuilds via
+  `/tmp/pip-build-env-*/overlay/bin/ninja`, which no longer exists. Always editable-install with
+  `--no-build-isolation` after installing `meson-python meson ninja cython numpy` in the target
+  environment.
 - Loop: `.clinerules/workflows/publish-progress.md` — push after every green task, merge to
   `main` only after a gate is approved.
 - Git identity is repo-local: `S-B-Iqbal <28038429+S-B-Iqbal@users.noreply.github.com>` (D-031).
