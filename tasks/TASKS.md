@@ -12,7 +12,7 @@
 - [x] P0.8 Phase-0 issue (#1) + phase labels created; publishing loop documented (`/publish-progress.md`)
 
 ## Phase 1 — Pure NumPy reference
-- [ ] P1.1 `_scaling_laws.py` + test_scaling_laws.py (Table 2, rounding, cap, n>2M)
+- [x] P1.1 `_scaling_laws.py` + test_scaling_laws.py (Table 2, rounding, cap, n>2M)
 - [ ] P1.2 `_schedule.py` + test_schedule.py (Eq. 5 endpoints, monotone)
 - [ ] P1.3 `_numpy_backend.py` assign + weighted reduce (dense) + tests
 - [ ] P1.4 `_revival.py` + test_revival.py (ΣN conserved, S=c·N, Eq. 8 pattern, donor ∝ N)

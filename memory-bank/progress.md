@@ -12,6 +12,9 @@
 | 6 Upstream drafts | not started | — |
 
 ## What works
+- P1.1: `emeans/_scaling_laws.py` — Eq. 6/7 with the Table 2 constants (3 s.f.), log2-space rounding
+  to a power of two (ties up, D-027), cap at `n`, the `/8` coefficient above 2e6, α0 computed from
+  the resolved B (D-006); 29 tests, 100 % line coverage of the module.
 - GitHub repository `S-B-Iqbal/emeans` (private, D-032) with `origin` configured; `main` holds the
   scaffold commit and `phase-0-plan` the Phase 0 work; labels `phase-0`…`phase-6` created.
 - CI on every push: `.github/workflows/tests.yml` — wheel install and editable install jobs
