@@ -12,6 +12,9 @@
 | 6 Upstream drafts | not started | — |
 
 ## What works
+- P1.2: `emeans/_schedule.py` — `n_updates = T·⌈n/B⌉` (D-004, tail kept) and `alpha(t, M, α0, ε)`
+  for `t = 1..M` (D-003; last step lands exactly on `ε·α0`), plus `alpha_schedule` for tests and
+  Phase 4 plots; shared validators extracted into `emeans/_validation.py`.
 - P1.1: `emeans/_scaling_laws.py` — Eq. 6/7 with the Table 2 constants (3 s.f.), log2-space rounding
   to a power of two (ties up, D-027), cap at `n`, the `/8` coefficient above 2e6, α0 computed from
   the resolved B (D-006); 29 tests, 100 % line coverage of the module.
