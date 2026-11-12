@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the paper below."
+title: "emeans: scikit-learn compatible e-means clustering"
+abstract: >-
+  Independent implementation of e-means (arXiv:2611.09501) as a scikit-learn compatible
+  estimator, EMeans.
+type: software
+license: BSD-3-Clause
+version: "0.1.0.dev0"
+repository-code: "https://github.com/S-B-Iqbal/emeans"
+authors:
+  - name: "S-B-Iqbal"
+preferred-citation:
+  type: article
+  title: "e-means: outperforming k-means (in one-tenth the epochs)"
+  journal: "arXiv preprint arXiv:2611.09501"
+  year: 2026
+  url: "https://arxiv.org/abs/2611.09501"
+  authors:
+    - family-names: "Bessa"
+      given-names: "Swann"
+    - family-names: "Mazaré"
+      given-names: "Pierre-Emmanuel"
+    - family-names: "Szilvasy"
+      given-names: "Gergely"
+    - family-names: "Touvron"
+      given-names: "Hugo"
+    - family-names: "Picard"
+      given-names: "David"
+    - family-names: "Douze"
+      given-names: "Matthijs"
+    - family-names: "Jégou"
+      given-names: "Hervé"
