@@ -1,0 +1,31 @@
+# Keeps Cline's context lean. NOTE: Cline marks .clineignore as deprecating and it is NOT a
+# security boundary — rule 01 separately forbids editing _ref/.
+_ref/
+build/
+builddir/
+dist/
+wheelhouse/
+.mesonpy-*/
+*.so
+*.pyd
+emeans/_kernels/*.c
+emeans/_kernels/*.cpp
+benchmarks/data/
+benchmarks/results/raw/
+datasets/
+*.npy
+*.npz
+*.fvecs
+*.bvecs
+*.ivecs
+*.h5
+*.parquet
+docs/_build/
+docs/auto_examples/
+.venv/
+.pixi/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
