@@ -21,6 +21,13 @@
    P1.9 determinism/dtype → P1.10 docstring doctests.
 3. Every constant keeps its paper citation (`Eq. N`, `Table N`, `Alg. 1 line N`, `App. X.Y`).
 
+## Publishing (D-030…D-034)
+- `origin` = `S-B-Iqbal/emeans` (private until the Phase 1 gate, then public — D-032); loop defined
+  in `.clinerules/workflows/publish-progress.md`: push after every green task, tick the phase issue,
+  merge to `main` only after a gate is approved.
+- CI: `.github/workflows/tests.yml` (ubuntu, py3.10) on every push (D-034); full matrix in Phase 5.
+- Phase 0.6 (repo creation, LICENSE/README/CITATION, CI) is tracked as P0.6–P0.8 in `TASKS.md`.
+
 ## Notes for the next session
 - Unit tests must stay fast: pass explicit `batch_size`/`n_epochs` rather than `"auto"` where
   the resolved batch size would be large.

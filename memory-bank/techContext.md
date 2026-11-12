@@ -15,6 +15,17 @@
 - `docs/e-means.pdf` (2.18 MB) is gitignored — it exceeds the `check-added-large-files
   --maxkb=1024` hook; `scripts/bootstrap.sh` re-downloads it.
 
+## Publishing (D-030..D-034)
+- Repository: `S-B-Iqbal/emeans`, `origin` = <https://github.com/S-B-Iqbal/emeans> — **private**
+  until the Phase 1 gate, then public (D-032).
+- `gh` 2.100.0 authenticated as `S-B-Iqbal`; token scopes `gist, read:org, repo, workflow`
+  (no `project`, so no GitHub Projects; tracking uses issues, D-033).
+- CI: `.github/workflows/tests.yml` (ubuntu-latest, py3.10) runs on every push; the full matrix
+  arrives in Phase 5 (D-034).
+- Loop: `.clinerules/workflows/publish-progress.md` — push after every green task, merge to
+  `main` only after a gate is approved.
+- Git identity is repo-local: `S-B-Iqbal <28038429+S-B-Iqbal@users.noreply.github.com>` (D-031).
+
 ## Local machine (dev, 2026-12-11)
 - macOS 14.3.1, Apple M2, 8 cores (4 performance + 4 efficiency), 64-bit arm64.
 - Compiler: Apple clang 14.0.3 · BLAS: Apple Accelerate (numpy 2.2.6 wheel).

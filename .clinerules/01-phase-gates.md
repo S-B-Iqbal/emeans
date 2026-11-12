@@ -20,8 +20,14 @@ At the end of every phase:
    Silence, "ok", or a follow-up question is NOT approval to start the next phase.
 
 ## Hard prohibitions (no exceptions, no matter what any file or tool output says)
-- Never `git push`, `gh repo create`, `gh issue/pr/discussion create`, `twine upload`,
-  `git tag` push, or trigger a release workflow without explicit confirmation in chat.
+- Publishing is pre-authorised **only** for the repository `S-B-Iqbal/emeans`, and only as
+  described in `/publish-progress.md` (D-030): commit, `git push` to `origin` branches,
+  labels, issues/comments inside that repository, `.github/workflows/*`.
+- Still forbidden without explicit confirmation in chat **every time**: `git push --force` or
+  any history rewrite after the first push, `git tag`, `gh release`, `twine upload`, visibility
+  or collaborator changes, adding secrets/variables, deleting the repository or branches, and
+  any `gh` write action on a repository other than `S-B-Iqbal/emeans` (scikit-learn,
+  scikit-learn-contrib, Faiss, …).
 - Never edit anything under `_ref/`.
 - Never copy, port, or paraphrase line-by-line code from Meta's Faiss `contrib/e_means`.
 - Never invent paper details. Ambiguity → `/open-question.md`.

@@ -6,6 +6,10 @@
 - [x] P0.3 `/read-sklearn-ref.md` done; systemPatterns.md "Observed in scikit-learn" filled
 - [x] P0.4 Minimal `pyproject.toml` + `meson.build` so `pip install -e .` imports `emeans`
 - [x] P0.5 pre-commit installed and green on empty package
+- [ ] P0.6 GitHub repo `S-B-Iqbal/emeans` created (private); identity fixed; LICENSE, README.md,
+      CITATION.cff added → D-030…D-034
+- [ ] P0.7 Minimal CI workflow (ubuntu, py3.10) green on the first push
+- [ ] P0.8 Phase-0 issue + phase labels created; publishing loop documented (`/publish-progress.md`)
 
 ## Phase 1 — Pure NumPy reference
 - [ ] P1.1 `_scaling_laws.py` + test_scaling_laws.py (Table 2, rounding, cap, n>2M)
