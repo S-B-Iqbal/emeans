@@ -2,8 +2,11 @@
 
 ## Architecture
 - `EMeans` (estimator) in `emeans/_emeans.py` orchestrates; math lives in pure helpers:
-  `_scaling_laws.py` (Eq. 6–7), `_schedule.py` (Eq. 5), `_revival.py` (App. H.1),
-  `_numpy_backend.py` (assignment + weighted count/sum reduction).
+  `_scaling_laws.py` (Eq. 6–7), `_schedule.py` (Eq. 5), `_numpy_backend.py` (assignment +
+  weighted count/sum reduction, dense and CSR), `_revival.py` (App. H.1),
+  `_validation.py` (shared scalar validators for those helpers).
+- `_numpy_backend.py` is the oracle: 256-row chunks, expanded distance form with float64
+  accumulators and lowest-index ties, float64 `(n_j, s_j)` (D-016, D-026, D-028, D-037).
 - Backend switch `_backend in {"numpy", "cython"}`; NumPy path is the oracle.
 - State: `_counts` (k,), `_sums` (k, d) dense even for CSR input; centroids derived `S / N`.
 
