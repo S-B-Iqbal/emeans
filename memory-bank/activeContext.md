@@ -26,7 +26,10 @@
   in `.clinerules/workflows/publish-progress.md`: push after every green task, tick the phase issue,
   merge to `main` only after a gate is approved.
 - CI: `.github/workflows/tests.yml` (ubuntu, py3.10) on every push (D-034); full matrix in Phase 5.
-- Phase 0.6 (repo creation, LICENSE/README/CITATION, CI) is tracked as P0.6–P0.8 in `TASKS.md`.
+  Green on `fix(ci): keep editable installs non-isolated…` (the very first run exposed the
+  meson-python editable/build-isolation trap).
+- Phase 0.6 (repo creation, LICENSE/README/CITATION, CI) is tracked as P0.6–P0.8 in `TASKS.md` and
+  in issue #1.
 
 ## Notes for the next session
 - Unit tests must stay fast: pass explicit `batch_size`/`n_epochs` rather than `"auto"` where
