@@ -13,8 +13,10 @@ build-backend = "mesonpy"
 name = "emeans"
 dynamic = ["version"]
 description = "e-means: scikit-learn compatible mini-batch k-means with exponential-moving-average centroids"
+readme = "README.md"
 requires-python = ">=3.10"
 license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 authors = [{ name = "The emeans developers" }]
 keywords = ["k-means", "clustering", "mini-batch", "scikit-learn", "unsupervised"]
 dependencies = [
