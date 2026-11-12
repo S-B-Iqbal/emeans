@@ -1,6 +1,8 @@
 python_sources = [
   '__init__.py',
   '_scaling_laws.py',
+  '_schedule.py',
+  '_validation.py',
 ]
 
 py.install_sources(

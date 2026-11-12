@@ -15,7 +15,8 @@ the values.
 from __future__ import annotations
 
 import math
-from numbers import Integral
+
+from emeans._validation import check_positive_integer as _check_positive_integer
 
 # Batch size, Eq. 7 with Table 2 coefficients:
 # B = b_c * k^b_k * n^b_n * T^b_T, row "batch B, knee at 0.2%".
@@ -148,15 +149,3 @@ def auto_hyperparameters(
     batch_size = auto_batch_size(n_samples, n_clusters, n_epochs)
     alpha0 = auto_alpha0(n_samples, n_clusters, n_epochs, batch_size)
     return batch_size, alpha0
-
-
-def _check_positive_integer(name: str, value: int) -> int:
-    """Validate a positive integer law input and return it as a built-in ``int``."""
-    if isinstance(value, bool) or not isinstance(value, Integral):
-        raise TypeError(
-            f"{name} must be an integer, got {type(value).__name__}: {value!r}."
-        )
-    value = int(value)
-    if value < 1:
-        raise ValueError(f"{name} must be >= 1, got {value}.")
-    return value
