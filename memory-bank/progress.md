@@ -12,6 +12,10 @@
 | 6 Upstream drafts | not started | — |
 
 ## What works
+- P1.3: `emeans/_numpy_backend.py` — chunked (256-row) assignment with the expanded distance form
+  and lowest-index ties (D-026, D-028), `labels_inertia` in one pass, and the weighted Eq. 3
+  reduction in float64 (D-016); dense **and** CSR through the same entry points, single-pass
+  operations verified against literal difference-form references.
 - P1.2: `emeans/_schedule.py` — `n_updates = T·⌈n/B⌉` (D-004, tail kept) and `alpha(t, M, α0, ε)`
   for `t = 1..M` (D-003; last step lands exactly on `ε·α0`), plus `alpha_schedule` for tests and
   Phase 4 plots; shared validators extracted into `emeans/_validation.py`.

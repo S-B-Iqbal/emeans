@@ -1,5 +1,6 @@
 python_sources = [
   '__init__.py',
+  '_numpy_backend.py',
   '_scaling_laws.py',
   '_schedule.py',
   '_validation.py',
