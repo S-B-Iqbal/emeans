@@ -3,8 +3,8 @@
 ## Phase status
 | Phase | Status | Approved |
 |---|---|---|
-| 0 Plan | done, gate pending | — |
-| 1 NumPy reference | not started | — |
+| 0 Plan | done | approved phase 0 (user, Act mode) |
+| 1 NumPy reference | in progress | — |
 | 2 Compliance | not started | — |
 | 3 Cython/OpenMP | not started | — |
 | 4 Benchmarks | not started | — |
@@ -38,4 +38,5 @@
 - Auto laws extrapolate outside DEEP's fit range (n/k < 8, n < 1e5, low d); we warn, we do not
   correct (D-021).
 - CPU speedups will be well below the paper's 64-core numbers (Apple M2, 8 cores here).
-- Git identity is a repo-local placeholder until the user sets their own (D-029).
+- Pushing to `origin` is pre-authorised inside this repository only (D-030); tags, releases, PyPI and
+  any write on another repository still need explicit confirmation.

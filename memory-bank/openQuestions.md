@@ -33,6 +33,8 @@ their Q id there).
 | Q-024 | D-026 | `init="random"` semantics with weights |
 | Q-025 | D-027 | power-of-two rounding rule |
 | Q-026 | D-028 | assignment arithmetic and tie-breaking |
+| Q-027 | D-035 | slow-EMA split geometry (children from the slow donor centroid) |
+| Q-028 | D-036 | first `partial_fit` batch needs `n >= k` |
 
 New ambiguities are appended here as `Q-NNN` with status `OPEN` via `/open-question.md`, and
 move to the decision log only after user approval.
