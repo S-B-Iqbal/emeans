@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: BSD-3-Clause
+
+[build-system]
+requires = [
+    "meson-python>=0.16",
+    "meson>=1.2",
+    "ninja",
+    "numpy>=1.24",
+]
+build-backend = "mesonpy"
+
+[project]
+name = "emeans"
+dynamic = ["version"]
+description = "e-means: scikit-learn compatible mini-batch k-means with exponential-moving-average centroids"
+requires-python = ">=3.10"
+license = "BSD-3-Clause"
+authors = [{ name = "The emeans developers" }]
+keywords = ["k-means", "clustering", "mini-batch", "scikit-learn", "unsupervised"]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.8",
+    "scikit-learn>=1.6",
+    "threadpoolctl>=3.1",
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0", "pytest-cov>=4.0"]
+doc = [
+    "sphinx>=7.0",
+    "numpydoc>=1.6",
+    "sphinx-gallery>=0.15",
+    "pydata-sphinx-theme>=0.15",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["emeans"]
+addopts = "-ra"
