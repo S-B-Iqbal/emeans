@@ -225,3 +225,19 @@ def test_float32_keeps_the_labels_stable():
     first = quick().fit(X64)
     second = quick().fit(X64.astype(np.float32))
     np.testing.assert_array_equal(first.labels_, second.labels_)
+
+
+def test_array_like_input_is_accepted():
+    X = blobs()
+    as_list = X.tolist()
+    estimator = quick().fit(as_list)
+    assert estimator.cluster_centers_.shape == (3, 4)
+    assert estimator.predict(as_list).shape == (X.shape[0],)
+    assert estimator.score(as_list) == pytest.approx(-estimator.inertia_, rel=1e-12)
+
+
+def test_fit_transform_accepts_array_like_input():
+    X = blobs()
+    transformed = quick().fit_transform(X.tolist())
+    assert transformed.shape == (X.shape[0], 3)
+    assert transformed.dtype == np.float64

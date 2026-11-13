@@ -47,6 +47,13 @@ MIN_SAMPLES_FOR_LAWS = 100_000
 MIN_SAMPLES_PER_CLUSTER = 8
 
 
+def _streaming_step(estimator):
+    """Constant step of ``partial_fit`` when it continues a ``fit`` (D-042)."""
+    if estimator.alpha0 != "auto":
+        return float(estimator.alpha0)
+    return estimator.alpha_floor_ratio * estimator.alpha0_
+
+
 class EMeans(
     ClassNamePrefixFeaturesOutMixin,
     TransformerMixin,
@@ -414,6 +421,7 @@ class EMeans(
         self._n_threads = _openmp_effective_n_threads()
         n_samples = X.shape[0]
         self.batch_size_, self.alpha0_ = self._resolve_hyperparameters(n_samples)
+        self._partial_fit_step = _streaming_step(self)
         centers = self._init_centroids(X, random_state, sample_weight)
         counts = np.full(self.n_clusters, INIT_COUNT, dtype=np.float64)
         sums = counts[:, None] * centers
@@ -493,7 +501,7 @@ class EMeans(
 
     def fit_transform(self, X, y=None, sample_weight=None):
         """Fit the model and transform X to the cluster-distance space."""
-        return self.fit(X, sample_weight=sample_weight)._transform(X)
+        return self.fit(X, sample_weight=sample_weight).transform(X)
 
     def score(self, X, y=None, sample_weight=None):
         """Opposite of the inertia of X with respect to the fitted centroids.
@@ -565,6 +573,8 @@ class EMeans(
             self.n_iter_ = 0
         else:
             self.n_steps_ = getattr(self, "n_steps_", 0)
+            if not hasattr(self, "_partial_fit_step"):
+                self._partial_fit_step = _streaming_step(self)
         step = self._partial_fit_step
         centers = self._sums / self._counts[:, None]
         labels = assign(X, centers)

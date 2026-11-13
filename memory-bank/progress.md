@@ -4,14 +4,15 @@
 | Phase | Status | Approved |
 |---|---|---|
 | 0 Plan | done | approved phase 0 (user, Act mode) |
-| 1 NumPy reference | done, gate pending | — |
-| 2 Compliance | not started | — |
+| 1 NumPy reference | done | approved phase 1 (user, Act mode) |
+| 2 Compliance | in progress | — |
 | 3 Cython/OpenMP | not started | — |
 | 4 Benchmarks | not started | — |
 | 5 Packaging | not started | — |
 | 6 Upstream drafts | not started | — |
 
 ## What works
+- P2.1-P2.4: `parametrize_with_checks` green for explicit and auto configs (223 passed / 4 justified xfails, D-041); dense == CSR equivalence; sample_weight exactness in the alpha0 = 1 regime plus a statistical repeated-rows test; validation and warning surface pinned. Two real bugs fixed (D-042, D-043). 248 passed, 4 xfailed, 99% coverage.
 - P1.7-P1.10: public API (`predict`, `transform` in Euclidean distances, `score`, `fit_predict`, `fit_transform`, `get_feature_names_out`), streaming `partial_fit` with a frozen constant step (D-014), float32/float64 agreement tests, and the full numpydoc docstring with runnable doctests. 107 unit tests, 109 doctests, 99% coverage, CI green.
 - P1.5/P1.6: `emeans/_compat.py` and `emeans/_emeans.py` - `EMeans.fit` runs the EMA loop (Eq. 2, global t, D-023), revives every `revival_period` updates, resolves `batch_size_`/`alpha0_` (Eq. 6-7), supports init random/k-means++/array, and finalises with last_epoch_mean / slow_ema / None (D-008, D-009); the extra assignment pass (D-018) sets labels_/inertia_. 90 tests, 99% coverage, _emeans.py 100%.
 - P1.4: `emeans/_revival.py` - Eq. 8 splits (delta = 2**-7, D-010), dead mask at
@@ -28,7 +29,7 @@
 - P1.1: `emeans/_scaling_laws.py` — Eq. 6/7 with the Table 2 constants (3 s.f.), log2-space rounding
   to a power of two (ties up, D-027), cap at `n`, the `/8` coefficient above 2e6, α0 computed from
   the resolved B (D-006); 29 tests, 100 % line coverage of the module.
-- GitHub repository `S-B-Iqbal/emeans` (private, D-032) with `origin` configured; `main` holds the
+- GitHub repository `S-B-Iqbal/emeans` (**public** since the Phase-1 gate, D-032) with `origin` configured; `main` holds the
   scaffold commit and `phase-0-plan` the Phase 0 work; labels `phase-0`…`phase-6` created.
 - CI on every push: `.github/workflows/tests.yml` — wheel install and editable install jobs
   (ubuntu, py3.10); first run failed on the editable path, fixed forward in `fix(ci): keep
