@@ -1,43 +1,25 @@
 # Active context
 
-**Phase:** 1 — Pure NumPy reference · **Mode:** ACT (user approved the plan in Act mode)
-**Status:** Phase 0 approved and merged to `main`; P1.1 in progress on `phase-1-numpy-ref`.
 
-## Phase 1 plan (approved)
-Branch `phase-1-numpy-ref`, issue #2. New modules `emeans/_scaling_laws.py`, `_schedule.py`,
-`_numpy_backend.py`, `_revival.py`, `_compat.py`, `_emeans.py` with matching tests in
-`emeans/tests/`. Every new file must be listed in `emeans/meson.build` /
-`emeans/tests/meson.build` — CI and `pytest --pyargs` only see the installed package.
+**Phase:** 1 - Pure NumPy reference - **Mode:** ACT (plan approved in Act mode)
+**Status:** P1.1-P1.10 done and pushed on `phase-1-numpy-ref`; waiting for
+`approved phase 1` (rule 01) before the merge to `main` and the public flip.
 
-- P1.1 `_scaling_laws.py`: Eq. 6–7 with Table 2 constants (3 s.f.), `round_to_power_of_two`
-  (ties up, D-027), cap at `n`, coefficient 0.0044 above 2e6 (D-006), α0 from the **resolved** B.
-- P1.2 `_schedule.py`: `n_updates = T·⌈n/B⌉` (D-004) and `alpha(t, M, α0, ε=0.1)` for `t = 1..M`
-  (D-003), with `alpha(M) == ε·α0` exactly.
-- P1.3 `_numpy_backend.py`: 256-row chunked expanded-form distances (D-028) with lowest-index ties,
-  weighted `(n_j, s_j)` reduction in float64 (D-016), dense + CSR.
-- P1.4 `_revival.py`: δ = 2⁻⁷ (D-010), dead = `N < 0.1·mean(N)`, donors ∝ `N` without replacement
-  excluding dead/already-split clusters (D-013), `min(#dead, #donors)` per event (D-012), children
-  from the donor centroid via the Eq. 8 pattern with `S = c·N` write-back; the slow state splits
-  from its own centroid (D-035).
-- P1.5 `EMeans.fit`: `N=1e-10`, `S=N·c⁰`, fresh permutation per epoch, global update counter
-  (D-023), revival every `revival_period` (Alg. 1 line 9); `_compat.py` wraps the private sklearn
-  imports; `_parameter_constraints` + `__sklearn_tags__`.
-- P1.6 finalization: `last_epoch_mean` (recorded last-epoch assignments, empty-cluster fallback,
-  D-009), `slow_ema` (constant `slow_ema_speed·ε·α0`, never used for assignment, D-008), `None`.
-- P1.7 public API: `predict`, `transform` (Euclidean distances), `score`, `fit_predict`,
-  `fit_transform`, `get_feature_names_out`, plus `labels_`/`inertia_` from one extra pass (D-018),
-  `n_iter_`/`n_steps_` (D-019), resolved `batch_size_`/`alpha0_`.
-- P1.8 `partial_fit`: constant step (D-014), first batch needs `n >= k` (D-036), `n_steps_` per call.
-- P1.9 determinism, float32 preservation, `n < k` `ValueError`, out-of-range `UserWarning` (D-021).
-- P1.10 numpydoc docstring with runnable Examples; `pytest --doctest-modules emeans` green.
+## Phase 1 (done)
+107 unit tests, 109 doctests, 99% coverage, CI green (wheel + editable jobs).
+Modules: `_scaling_laws` (Eq. 6-7), `_schedule` (Eq. 5), `_numpy_backend`
+(Eq. 1/3, dense + CSR), `_revival` (App. H.1), `_compat`, `_validation`,
+`_emeans` (`EMeans`: fit, finalization, public API, partial_fit).
 
-Acceptance: every suite green locally **and** in CI; `pytest --cov=emeans --cov-fail-under=90`;
-each non-obvious constant carries its paper citation; no Python-level loop over samples.
-
-Risks: float-noise-sensitive ties (compare against a brute-force float64 reference), auto batch
-size ≈ n on small test data (pass explicit `batch_size`), `last_epoch_mean` monotonicity only on
-non-empty clusters (D-009), `_check_sample_weight` returning `X.dtype` weights (cast to float64).
-Open questions touched: Q-027, Q-028 (both resolved as D-035/D-036).
+## Phase 2 plan (proposed, needs approval)
+1. `parametrize_with_checks([EMeans(...)])` green, with any justified
+   `expected_failed_checks` recorded in the decision log (P2.1).
+2. CSR coverage: `test_sparse.py` with dense == sparse (same seed, explicit
+   params) for centres, labels and inertia (P2.2).
+3. `test_sample_weight.py`: exact equivalence in the `partial_fit(alpha0=1.0)`
+   regime, weight-scale invariance, and a statistical duplicated-rows test
+   (P2.3).
+4. Validation messages matched to sklearn style; error/warning tests (P2.4).
 
 ## Phase 0 (done, approved)
 meson-python skeleton, `emeans/__init__.py` + `py.typed` + smoke test, LICENSE/README/CITATION.cff,
