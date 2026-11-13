@@ -1,6 +1,7 @@
 py.install_sources(
   [
     '__init__.py',
+    'test_backends.py',
     'test_common.py',
     'test_emeans.py',
     'test_finalization.py',

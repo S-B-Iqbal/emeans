@@ -34,7 +34,7 @@
 - [x] P3.2 `_assign.pyx` dense + CSR (chunked, prange, GEMM + argmin)
 - [x] P3.3 `_reduce.pyx` dense + CSR (thread-local buffers)
 - [x] P3.4 threadpoolctl BLAS limit; `_backend` switch
-- [ ] P3.5 test_backends.py NumPy == Cython
+- [x] P3.5 test_backends.py NumPy == Cython
 - [ ] P3.6 Micro-benchmark: Cython vs NumPy path speedup recorded in progress.md
 
 ## Phase 4 — Benchmarks
