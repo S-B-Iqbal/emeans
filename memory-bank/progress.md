@@ -5,8 +5,8 @@
 |---|---|---|
 | 0 Plan | done | approved phase 0 (user, Act mode) |
 | 1 NumPy reference | done | approved phase 1 (user, Act mode) |
-| 2 Compliance | in progress | — |
-| 3 Cython/OpenMP | not started | — |
+| 2 Compliance | done | approved phase 2 (user, Act mode) |
+| 3 Cython/OpenMP | in progress | — |
 | 4 Benchmarks | not started | — |
 | 5 Packaging | not started | — |
 | 6 Upstream drafts | not started | — |

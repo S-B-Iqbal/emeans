@@ -1,9 +1,13 @@
 # Active context
 
 
-**Phase:** 2 - Compliance - **Mode:** ACT (Phase 2 plan approved with Phase 1)
-**Status:** Phase 1 approved, merged to `main` and the repo is public; P2.1 in
-progress on `phase-2-compliance` (issue #3).
+**Phase:** 3 - Cython/OpenMP kernels - **Mode:** ACT (approved with Phase 2)
+**Status:** Phases 1-2 approved and merged to `main` (repo public); P3.1 in
+progress on `phase-3-kernels` (issue #4).
+
+## Phase 2 (done)
+- `parametrize_with_checks` green (223 passed / 4 justified xfails, D-041); two real
+  bugs fixed (D-042, D-043); dense == CSR, sample_weight and validation suites added.
 
 ## Phase 1 (done)
 107 unit tests, 109 doctests, 99% coverage, CI green (wheel + editable jobs).
@@ -11,20 +15,28 @@ Modules: `_scaling_laws` (Eq. 6-7), `_schedule` (Eq. 5), `_numpy_backend`
 (Eq. 1/3, dense + CSR), `_revival` (App. H.1), `_compat`, `_validation`,
 `_emeans` (`EMeans`: fit, finalization, public API, partial_fit).
 
-## Phase 2 plan (approved)
-1. `parametrize_with_checks([EMeans(...)])` green, with any justified
-   `expected_failed_checks` recorded in the decision log (P2.1).
-2. CSR coverage: `test_sparse.py` with dense == sparse (same seed, explicit
-   params) for centres, labels and inertia (P2.2).
-3. `test_sample_weight.py`: exact equivalence in the `partial_fit(alpha0=1.0)`
-   regime, weight-scale invariance, and a statistical duplicated-rows test
-   (P2.3).
-4. Validation messages matched to sklearn style; error/warning tests (P2.4).
+## Phase 3 plan (approved)
+Issue #4, branch `phase-3-kernels`. OpenMP is optional (D-044): Apple clang has
+no `-fopenmp`, so the local build is serial while CI exercises the parallel path.
 
-## Phase 0 (done, approved)
-meson-python skeleton, `emeans/__init__.py` + `py.typed` + smoke test, LICENSE/README/CITATION.cff,
-minimal CI, decisions D-001…D-036, sklearn reference recorded in `systemPatterns.md`
-(@7b2b14e0a89eedfa514dc9885e35a0ecade20cd0); repo private, issue #1 closed at the gate.
+- P3.1 `emeans/_kernels/`: `_common.pxd` (helpers citing sklearn `_k_means_common.pxd`),
+  `meson.build` with `np_dep` + `openmp_dep`; root `meson.build` gains the Cython
+  generator; build proof with a dummy extension.
+- P3.2 `_assign.pyx`: `floating` fused type, CHUNK_SIZE = 256, chunked
+  `prange(nogil=True, num_threads=n_threads)`, `dgemm` (from
+  `scipy.linalg.cython_blas`) + `||x||^2 + ||c||^2` + argmin with strict `<`;
+  dense and CSR variants.
+- P3.3 `_reduce.pyx`: per-thread `(k,)` counts and `(k, d)` sums, final float64
+  reduction, dense and CSR.
+- P3.4 `emeans/_backend.py`: `get_backend`/`set_backend` dispatching assign, reduce,
+  distances, labels_inertia; the estimator keeps a private `self._backend`; the
+  training loop is wrapped in `_get_threadpool_controller().limit(...)` (D-038).
+- P3.5 `test_backends.py`: NumPy == Cython (identical labels, allclose counts/sums)
+  over dense/CSR x float32/float64.
+- P3.6 micro-benchmark recorded in `progress.md` (serial locally, OpenMP in CI).
+
+Decisions: D-044 (optional OpenMP), D-045 (fused type but float64 dispatch),
+D-046 (module-level switch, no new public parameter).
 
 ## Publishing (D-030…D-034)
 - `origin` = `S-B-Iqbal/emeans` (private until the Phase 1 gate, then public — D-032); loop defined
