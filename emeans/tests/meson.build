@@ -10,6 +10,7 @@ py.install_sources(
     'test_package.py',
     'test_scaling_laws.py',
     'test_schedule.py',
+    'test_sparse.py',
   ],
   subdir: 'emeans/tests',
 )
