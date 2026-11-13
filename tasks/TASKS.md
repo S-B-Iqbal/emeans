@@ -24,7 +24,7 @@
 - [x] P1.10 numpydoc docstring with runnable Examples (doctest green)
 
 ## Phase 2 — Compliance
-- [ ] P2.1 `parametrize_with_checks` green (justified xfails only, logged in decisionLog)
+- [x] P2.1 `parametrize_with_checks` green (justified xfails only, logged in decisionLog)
 - [ ] P2.2 CSR support; test_sparse.py dense == sparse
 - [ ] P2.3 test_sample_weight.py (deterministic equivalence + statistical)
 - [ ] P2.4 Parameter validation messages match sklearn style

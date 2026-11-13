@@ -85,3 +85,25 @@ def test_the_revival_counter_continues_across_calls():
     for _ in range(3):
         estimator.partial_fit(X)
     assert estimator.n_steps_ == 3
+
+
+def test_partial_fit_after_fit_continues_the_stream():
+    X = blobs()
+    estimator = EMeans(
+        n_clusters=2, n_epochs=1, batch_size=16, alpha0=0.5, random_state=0
+    ).fit(X)
+    steps_after_fit = estimator.n_steps_
+    assert steps_after_fit == 3  # ceil(40 / 16)
+    assert estimator._partial_fit_step == 0.5
+    estimator.partial_fit(X)
+    assert estimator.n_steps_ == steps_after_fit + 1
+
+
+def test_partial_fit_after_fit_with_auto_params():
+    X = blobs()
+    estimator = EMeans(n_clusters=2, n_epochs=1, batch_size=16, random_state=0)
+    estimator.fit(X)
+    expected = 0.1 * estimator.alpha0_
+    assert estimator._partial_fit_step == expected
+    estimator.partial_fit(X)
+    assert estimator.n_steps_ == 4
