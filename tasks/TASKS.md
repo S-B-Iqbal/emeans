@@ -30,7 +30,7 @@
 - [x] P2.4 Parameter validation messages match sklearn style
 
 ## Phase 3 — Performance
-- [ ] P3.1 `_kernels/_common.pxd` helpers; meson.build with openmp_dep
+- [x] P3.1 `_kernels/_common.pxd` helpers; meson.build with openmp_dep
 - [ ] P3.2 `_assign.pyx` dense + CSR (chunked, prange, GEMM + argmin)
 - [ ] P3.3 `_reduce.pyx` dense + CSR (thread-local buffers)
 - [ ] P3.4 threadpoolctl BLAS limit; `_backend` switch

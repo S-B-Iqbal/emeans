@@ -20,4 +20,5 @@ py.install_sources(
   pure: false,
 )
 
+subdir('_kernels')
 subdir('tests')

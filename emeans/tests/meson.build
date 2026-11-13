@@ -4,6 +4,7 @@ py.install_sources(
     'test_common.py',
     'test_emeans.py',
     'test_finalization.py',
+    'test_kernels.py',
     'test_numpy_backend.py',
     'test_partial_fit.py',
     'test_revival.py',
