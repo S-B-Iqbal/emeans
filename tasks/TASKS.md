@@ -18,7 +18,7 @@
 - [x] P1.4 `_revival.py` + test_revival.py (ΣN conserved, S=c·N, Eq. 8 pattern, donor ∝ N)
 - [x] P1.5 `EMeans.fit` loop (init random / k-means++ / array; EMA; shuffle per epoch)
 - [x] P1.6 Finalization: last_epoch_mean / slow_ema / None + test_finalization.py
-- [ ] P1.7 predict / transform / score / fit_predict / fit_transform / get_feature_names_out
+- [x] P1.7 predict / transform / score / fit_predict / fit_transform / get_feature_names_out
 - [ ] P1.8 partial_fit (constant α per Q-012) + test_partial_fit.py
 - [ ] P1.9 Determinism with random_state; float32 preservation tests
 - [ ] P1.10 numpydoc docstring with runnable Examples (doctest green)

@@ -20,11 +20,17 @@ from emeans._compat import (
     _fit_context,
     _openmp_effective_n_threads,
     check_array,
+    check_is_fitted,
     check_random_state,
     kmeans_plusplus,
     validate_data,
 )
-from emeans._numpy_backend import assign, labels_inertia, reduce_batch
+from emeans._numpy_backend import (
+    assign,
+    distances,
+    labels_inertia,
+    reduce_batch,
+)
 from emeans._revival import revive
 from emeans._scaling_laws import auto_alpha0, auto_batch_size
 from emeans._schedule import (
@@ -326,3 +332,74 @@ class EMeans(
         tags = super().__sklearn_tags__()
         tags.input_tags.sparse = True
         return tags
+
+    def _check_test_data(self, X):
+        """Validate new data against the fitted feature count."""
+        return validate_data(
+            self,
+            X,
+            accept_sparse="csr",
+            dtype=[np.float64, np.float32],
+            order="C",
+            accept_large_sparse=False,
+            reset=False,
+        )
+
+    def _transform(self, X):
+        """Cluster distances without re-validating X (sklearn pattern)."""
+        squared = distances(X, self.cluster_centers_)
+        return np.sqrt(squared).astype(X.dtype, copy=False)
+
+    def predict(self, X):
+        """Predict the closest cluster for each row of X.
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            New rows to assign.
+
+        Returns
+        -------
+        labels : ndarray of shape (n_samples,), dtype int32
+            Index of the closest centroid for each row.
+        """
+        check_is_fitted(self)
+        return assign(self._check_test_data(X), self.cluster_centers_)
+
+    def transform(self, X):
+        """Distances from each row of X to every cluster centre.
+
+        In the new space each column is the Euclidean distance (not squared)
+        to one centroid, so the output dtype follows the input dtype.
+
+        Returns
+        -------
+        X_new : ndarray of shape (n_samples, n_clusters)
+        """
+        check_is_fitted(self)
+        return self._transform(self._check_test_data(X))
+
+    def fit_predict(self, X, y=None, sample_weight=None):
+        """Fit the model and return the labels of the training rows."""
+        return self.fit(X, sample_weight=sample_weight).labels_
+
+    def fit_transform(self, X, y=None, sample_weight=None):
+        """Fit the model and transform X to the cluster-distance space."""
+        return self.fit(X, sample_weight=sample_weight)._transform(X)
+
+    def score(self, X, y=None, sample_weight=None):
+        """Opposite of the inertia of X with respect to the fitted centroids.
+
+        Returns
+        -------
+        score : float
+            ``-sum_i w_i * ||x_i - c_{a(i)}||**2``, so higher is better.
+        """
+        check_is_fitted(self)
+        X = self._check_test_data(X)
+        sample_weight = np.asarray(
+            _check_sample_weight(sample_weight, X, dtype=X.dtype),
+            dtype=np.float64,
+        )
+        _, inertia = labels_inertia(X, self.cluster_centers_, sample_weight)
+        return -inertia

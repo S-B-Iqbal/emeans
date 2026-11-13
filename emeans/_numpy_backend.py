@@ -211,3 +211,23 @@ def _chunks(n_samples, chunk_size):
     """Yield ``(start, stop)`` row bounds covering ``[0, n_samples)``."""
     for start in range(0, n_samples, chunk_size):
         yield start, min(start + chunk_size, n_samples)
+
+
+def distances(X, centers, chunk_size: int = CHUNK_SIZE) -> np.ndarray:
+    """Squared distances between every row of ``X`` and every centroid.
+
+    Used by ``EMeans.transform``; the chunked loop keeps the (chunk, k) buffer
+    bounded and is the same code path as :func:`assign`.
+
+    Returns
+    -------
+    ndarray of shape (n_samples, n_clusters), dtype float64
+    """
+    centers64, centers_sq, x_squared_norms = _prepare_centers(centers, X, None)
+    chunk_size = check_positive_integer("chunk_size", chunk_size)
+    out = np.empty((X.shape[0], centers64.shape[0]), dtype=np.float64)
+    for start, stop in _chunks(X.shape[0], chunk_size):
+        out[start:stop] = _distances(
+            X[start:stop], centers64, centers_sq, x_squared_norms[start:stop]
+        )
+    return out

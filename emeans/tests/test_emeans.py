@@ -6,8 +6,10 @@ import warnings
 import numpy as np
 import pytest
 import scipy.sparse as sp
+from sklearn.exceptions import NotFittedError
 
 from emeans import EMeans
+from emeans._numpy_backend import labels_inertia
 
 
 def blobs(seed=0, n_per_cluster=40, n_clusters=3, n_features=4):
@@ -138,3 +140,70 @@ def test_verbose_prints_one_line_per_epoch(capsys):
     out = capsys.readouterr().out
     assert out.count("Epoch ") == 2
     assert "steps 16/16" in out  # 120 / 16 = 7.5 -> 8 batches per epoch
+
+
+def test_labels_match_predict():
+    X = blobs()
+    estimator = quick().fit(X)
+    np.testing.assert_array_equal(estimator.labels_, estimator.predict(X))
+
+
+def test_transform_returns_euclidean_distances():
+    X = blobs()
+    estimator = quick().fit(X)
+    transformed = estimator.transform(X)
+    assert transformed.shape == (X.shape[0], 3)
+    assert transformed.dtype == X.dtype
+    differences = X[:, None, :] - estimator.cluster_centers_[None, :, :]
+    expected = np.sqrt((differences**2).sum(axis=-1))
+    np.testing.assert_allclose(transformed, expected, rtol=1e-9, atol=1e-9)
+
+
+def test_float32_is_preserved():
+    X = blobs().astype(np.float32)
+    estimator = quick().fit(X)
+    assert estimator.cluster_centers_.dtype == np.float32
+    assert estimator.transform(X).dtype == np.float32
+    assert estimator.predict(X).dtype == np.int32
+
+
+def test_score_is_minus_the_inertia():
+    X = blobs()
+    estimator = quick().fit(X)
+    assert estimator.score(X) == pytest.approx(-estimator.inertia_, rel=1e-12)
+    weights = np.linspace(0.5, 1.5, X.shape[0])
+    expected = labels_inertia(X, estimator.cluster_centers_, weights)[1]
+    assert estimator.score(X, sample_weight=weights) == pytest.approx(
+        -expected, rel=1e-12
+    )
+
+
+def test_fit_predict_and_fit_transform():
+    X = blobs()
+    labels = quick().fit_predict(X)
+    assert labels.shape == (X.shape[0],)
+    transformed = quick().fit_transform(X)
+    assert transformed.shape == (X.shape[0], 3)
+
+
+def test_feature_names_come_from_the_mixin():
+    estimator = quick().fit(blobs())
+    assert list(estimator.get_feature_names_out()) == [
+        "emeans0",
+        "emeans1",
+        "emeans2",
+    ]
+
+
+def test_predict_and_transform_require_a_fitted_model():
+    with pytest.raises(NotFittedError):
+        quick().predict(blobs())
+    with pytest.raises(NotFittedError):
+        quick().transform(blobs())
+
+
+def test_predict_rejects_a_different_feature_count():
+    X = blobs()
+    estimator = quick().fit(X)
+    with pytest.raises(ValueError):
+        estimator.predict(np.zeros((5, 7)))
