@@ -403,3 +403,82 @@ class EMeans(
         )
         _, inertia = labels_inertia(X, self.cluster_centers_, sample_weight)
         return -inertia
+
+    @_fit_context(prefer_skip_nested_validation=True)
+    def partial_fit(self, X, y=None, sample_weight=None):
+        """Update the model with a single mini-batch (streaming extension).
+
+        The step is held **constant** across calls (there is no horizon to
+        anneal over): a float ``alpha0`` is used verbatim, while ``"auto"``
+        freezes ``alpha_floor_ratio * alpha0_law(k, B, n, T=1)`` on the first
+        call (D-014).  The first call must supply at least ``n_clusters``
+        rows, since its rows seed the initial centroids (D-036).
+
+        Returns
+        -------
+        self : EMeans
+        """
+        has_centers = hasattr(self, "cluster_centers_")
+        X = validate_data(
+            self,
+            X,
+            accept_sparse="csr",
+            dtype=[np.float64, np.float32],
+            order="C",
+            accept_large_sparse=False,
+            reset=not has_centers,
+        )
+        self._random_state = getattr(
+            self, "_random_state", check_random_state(self.random_state)
+        )
+        sample_weight = np.asarray(
+            _check_sample_weight(sample_weight, X, dtype=X.dtype), dtype=np.float64
+        )
+        if not has_centers:
+            if X.shape[0] < self.n_clusters:
+                raise ValueError(
+                    f"n_samples={X.shape[0]} should be >= n_clusters="
+                    f"{self.n_clusters} on the first partial_fit call."
+                )
+            self._n_threads = _openmp_effective_n_threads()
+            n_rows = X.shape[0]
+            self.batch_size_ = n_rows
+            if self.alpha0 == "auto":
+                peak = auto_alpha0(n_rows, self.n_clusters, 1, n_rows)
+                self.alpha0_ = peak
+                self._partial_fit_step = self.alpha_floor_ratio * peak
+            else:
+                self.alpha0_ = float(self.alpha0)
+                self._partial_fit_step = float(self.alpha0)
+            centers = self._init_centroids(X, self._random_state, sample_weight)
+            self._counts = np.full(self.n_clusters, INIT_COUNT, dtype=np.float64)
+            self._sums = self._counts[:, None] * centers
+            self.n_steps_ = 0
+            self.n_iter_ = 0
+        else:
+            self.n_steps_ = getattr(self, "n_steps_", 0)
+        step = self._partial_fit_step
+        centers = self._sums / self._counts[:, None]
+        labels = assign(X, centers)
+        batch_counts, batch_sums = reduce_batch(
+            X, labels, self.n_clusters, sample_weight
+        )
+        self._counts *= 1.0 - step
+        self._counts += step * batch_counts
+        self._sums *= 1.0 - step
+        self._sums += step * batch_sums
+        self.n_steps_ += 1
+        if self.n_steps_ % self.revival_period == 0:
+            revive(
+                [(self._counts, self._sums)],
+                self._random_state,
+                self.revival_threshold,
+            )
+        self.cluster_centers_ = (self._sums / self._counts[:, None]).astype(
+            X.dtype, copy=False
+        )
+        self._n_features_out = self.cluster_centers_.shape[0]
+        self.labels_, self.inertia_ = labels_inertia(
+            X, self.cluster_centers_, sample_weight
+        )
+        return self
