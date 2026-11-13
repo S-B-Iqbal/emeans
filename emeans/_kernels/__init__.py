@@ -5,8 +5,10 @@ try:
     from emeans._kernels._probe import has_openmp, max_threads
 
     HAS_KERNELS = True
-except ImportError:  # pragma: no cover - pure-Python install
+    _IMPORT_ERROR = None
+except ImportError as exc:  # pragma: no cover - pure-Python install
     HAS_KERNELS = False
+    _IMPORT_ERROR = exc
 
     def has_openmp():
         """False when the compiled kernels are not available."""

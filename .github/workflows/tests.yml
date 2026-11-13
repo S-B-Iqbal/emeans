@@ -26,8 +26,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install ".[test]"
       # Editable installs must not use build isolation: the meson-python editable
-      # loader rebuilds on import and would look for the ninja binary of the
-      # (deleted) build-isolation overlay.
+      # loader rebuilds on import and looks for the ninja binary of the (deleted)
+      # build-isolation overlay.
       - name: Install editable
         if: matrix.install == 'editable'
         run: |
@@ -35,8 +35,21 @@ jobs:
           python -m pip install meson-python meson ninja cython "numpy>=1.24"
           python -m pip install -e ".[test]" --no-build-isolation
       - name: Report OpenMP support
+        working-directory: ${{ runner.temp }}
         run: python -c "from emeans._kernels import has_openmp, max_threads; print(has_openmp(), max_threads())"
-      - name: Unit tests
+      # The wheel leg must run outside the checkout: otherwise the source tree
+      # shadows the installed package and the compiled extension is missing.
+      - name: Unit tests (installed wheel)
+        if: matrix.install == 'wheel'
+        working-directory: ${{ runner.temp }}
         run: python -m pytest --pyargs emeans -q
-      - name: Doctests
+      - name: Doctests (installed wheel)
+        if: matrix.install == 'wheel'
+        working-directory: ${{ runner.temp }}
+        run: python -m pytest --doctest-modules emeans -q
+      - name: Unit tests (editable source tree)
+        if: matrix.install == 'editable'
+        run: python -m pytest --pyargs emeans -q
+      - name: Doctests (editable source tree)
+        if: matrix.install == 'editable'
         run: python -m pytest --doctest-modules emeans -q
