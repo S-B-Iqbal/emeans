@@ -26,8 +26,8 @@
 ## Phase 2 — Compliance
 - [x] P2.1 `parametrize_with_checks` green (justified xfails only, logged in decisionLog)
 - [x] P2.2 CSR support; test_sparse.py dense == sparse
-- [ ] P2.3 test_sample_weight.py (deterministic equivalence + statistical)
-- [ ] P2.4 Parameter validation messages match sklearn style
+- [x] P2.3 test_sample_weight.py (deterministic equivalence + statistical)
+- [x] P2.4 Parameter validation messages match sklearn style
 
 ## Phase 3 — Performance
 - [ ] P3.1 `_kernels/_common.pxd` helpers; meson.build with openmp_dep

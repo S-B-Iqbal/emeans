@@ -107,3 +107,13 @@ def test_partial_fit_after_fit_with_auto_params():
     assert estimator._partial_fit_step == expected
     estimator.partial_fit(X)
     assert estimator.n_steps_ == 4
+
+
+def test_partial_fit_recovers_a_missing_streaming_step():
+    X = blobs()
+    estimator = EMeans(
+        n_clusters=2, n_epochs=1, batch_size=16, alpha0=0.5, random_state=0
+    ).fit(X)
+    del estimator._partial_fit_step  # e.g. state written by an older version
+    estimator.partial_fit(X)
+    assert estimator._partial_fit_step == 0.5
