@@ -15,7 +15,7 @@
 - [x] P1.1 `_scaling_laws.py` + test_scaling_laws.py (Table 2, rounding, cap, n>2M)
 - [x] P1.2 `_schedule.py` + test_schedule.py (Eq. 5 endpoints, monotone)
 - [x] P1.3 `_numpy_backend.py` assign + weighted reduce (dense) + tests
-- [ ] P1.4 `_revival.py` + test_revival.py (ΣN conserved, S=c·N, Eq. 8 pattern, donor ∝ N)
+- [x] P1.4 `_revival.py` + test_revival.py (ΣN conserved, S=c·N, Eq. 8 pattern, donor ∝ N)
 - [ ] P1.5 `EMeans.fit` loop (init random / k-means++ / array; EMA; shuffle per epoch)
 - [ ] P1.6 Finalization: last_epoch_mean / slow_ema / None + test_finalization.py
 - [ ] P1.7 predict / transform / score / fit_predict / fit_transform / get_feature_names_out

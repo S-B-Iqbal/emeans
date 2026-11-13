@@ -12,6 +12,10 @@
 | 6 Upstream drafts | not started | — |
 
 ## What works
+- P1.4: `emeans/_revival.py` - Eq. 8 splits (delta = 2**-7, D-010), dead mask at
+  tau*mean(N), donors proportional to N without replacement (D-013), min(#dead, #live)
+  per event (D-012), S = c*N write-back, slow state split from its own centroid
+  (D-035); in-place updates, 18 tests.
 - P1.3: `emeans/_numpy_backend.py` — chunked (256-row) assignment with the expanded distance form
   and lowest-index ties (D-026, D-028), `labels_inertia` in one pass, and the weighted Eq. 3
   reduction in float64 (D-016); dense **and** CSR through the same entry points, single-pass
