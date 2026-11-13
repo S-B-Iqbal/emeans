@@ -4,8 +4,8 @@
 | Phase | Status | Approved |
 |---|---|---|
 | 0 Plan | done | approved phase 0 (user, Act mode) |
-| 1 NumPy reference | done, gate pending | — |
-| 2 Compliance | not started | — |
+| 1 NumPy reference | done | approved phase 1 (user, Act mode) |
+| 2 Compliance | in progress | — |
 | 3 Cython/OpenMP | not started | — |
 | 4 Benchmarks | not started | — |
 | 5 Packaging | not started | — |
@@ -28,7 +28,7 @@
 - P1.1: `emeans/_scaling_laws.py` — Eq. 6/7 with the Table 2 constants (3 s.f.), log2-space rounding
   to a power of two (ties up, D-027), cap at `n`, the `/8` coefficient above 2e6, α0 computed from
   the resolved B (D-006); 29 tests, 100 % line coverage of the module.
-- GitHub repository `S-B-Iqbal/emeans` (private, D-032) with `origin` configured; `main` holds the
+- GitHub repository `S-B-Iqbal/emeans` (**public** since the Phase-1 gate, D-032) with `origin` configured; `main` holds the
   scaffold commit and `phase-0-plan` the Phase 0 work; labels `phase-0`…`phase-6` created.
 - CI on every push: `.github/workflows/tests.yml` — wheel install and editable install jobs
   (ubuntu, py3.10); first run failed on the editable path, fixed forward in `fix(ci): keep

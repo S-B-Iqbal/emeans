@@ -1,9 +1,9 @@
 # Active context
 
 
-**Phase:** 1 - Pure NumPy reference - **Mode:** ACT (plan approved in Act mode)
-**Status:** P1.1-P1.10 done and pushed on `phase-1-numpy-ref`; waiting for
-`approved phase 1` (rule 01) before the merge to `main` and the public flip.
+**Phase:** 2 - Compliance - **Mode:** ACT (Phase 2 plan approved with Phase 1)
+**Status:** Phase 1 approved, merged to `main` and the repo is public; P2.1 in
+progress on `phase-2-compliance` (issue #3).
 
 ## Phase 1 (done)
 107 unit tests, 109 doctests, 99% coverage, CI green (wheel + editable jobs).
@@ -11,7 +11,7 @@ Modules: `_scaling_laws` (Eq. 6-7), `_schedule` (Eq. 5), `_numpy_backend`
 (Eq. 1/3, dense + CSR), `_revival` (App. H.1), `_compat`, `_validation`,
 `_emeans` (`EMeans`: fit, finalization, public API, partial_fit).
 
-## Phase 2 plan (proposed, needs approval)
+## Phase 2 plan (approved)
 1. `parametrize_with_checks([EMeans(...)])` green, with any justified
    `expected_failed_checks` recorded in the decision log (P2.1).
 2. CSR coverage: `test_sparse.py` with dense == sparse (same seed, explicit
