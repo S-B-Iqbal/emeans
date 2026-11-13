@@ -16,8 +16,8 @@
 - [x] P1.2 `_schedule.py` + test_schedule.py (Eq. 5 endpoints, monotone)
 - [x] P1.3 `_numpy_backend.py` assign + weighted reduce (dense) + tests
 - [x] P1.4 `_revival.py` + test_revival.py (ΣN conserved, S=c·N, Eq. 8 pattern, donor ∝ N)
-- [ ] P1.5 `EMeans.fit` loop (init random / k-means++ / array; EMA; shuffle per epoch)
-- [ ] P1.6 Finalization: last_epoch_mean / slow_ema / None + test_finalization.py
+- [x] P1.5 `EMeans.fit` loop (init random / k-means++ / array; EMA; shuffle per epoch)
+- [x] P1.6 Finalization: last_epoch_mean / slow_ema / None + test_finalization.py
 - [ ] P1.7 predict / transform / score / fit_predict / fit_transform / get_feature_names_out
 - [ ] P1.8 partial_fit (constant α per Q-012) + test_partial_fit.py
 - [ ] P1.9 Determinism with random_state; float32 preservation tests

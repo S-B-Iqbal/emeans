@@ -12,6 +12,7 @@
 | 6 Upstream drafts | not started | — |
 
 ## What works
+- P1.5/P1.6: `emeans/_compat.py` and `emeans/_emeans.py` - `EMeans.fit` runs the EMA loop (Eq. 2, global t, D-023), revives every `revival_period` updates, resolves `batch_size_`/`alpha0_` (Eq. 6-7), supports init random/k-means++/array, and finalises with last_epoch_mean / slow_ema / None (D-008, D-009); the extra assignment pass (D-018) sets labels_/inertia_. 90 tests, 99% coverage, _emeans.py 100%.
 - P1.4: `emeans/_revival.py` - Eq. 8 splits (delta = 2**-7, D-010), dead mask at
   tau*mean(N), donors proportional to N without replacement (D-013), min(#dead, #live)
   per event (D-012), S = c*N write-back, slow state split from its own centroid
