@@ -46,7 +46,7 @@ jobs:
       - name: Doctests (installed wheel)
         if: matrix.install == 'wheel'
         working-directory: ${{ runner.temp }}
-        run: python -m pytest --doctest-modules emeans -q
+        run: python -m pytest --doctest-modules --pyargs emeans -q
       - name: Unit tests (editable source tree)
         if: matrix.install == 'editable'
         run: python -m pytest --pyargs emeans -q
