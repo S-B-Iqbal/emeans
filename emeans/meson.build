@@ -1,5 +1,6 @@
 python_sources = [
   '__init__.py',
+  '_backend.py',
   '_compat.py',
   '_emeans.py',
   '_numpy_backend.py',
