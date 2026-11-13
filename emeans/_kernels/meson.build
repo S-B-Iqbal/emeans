@@ -3,10 +3,12 @@ py.install_sources(
   subdir: 'emeans/_kernels',
 )
 
-py.extension_module(
-  '_probe',
-  [cython_gen.process('_probe.pyx')],
-  dependencies: [np_dep, openmp_dep],
-  subdir: 'emeans/_kernels',
-  install: true,
-)
+foreach kernel : ['_probe', '_common', '_assign']
+  py.extension_module(
+    kernel,
+    [cython_gen.process(kernel + '.pyx')],
+    dependencies: [np_dep, openmp_dep],
+    subdir: 'emeans/_kernels',
+    install: true,
+  )
+endforeach
