@@ -108,3 +108,66 @@ def test_assign_breaks_ties_to_the_lowest_index():
         1,
     )
     np.testing.assert_array_equal(labels, [0, 0])
+
+
+# --- reduction kernels (P3.3) ----------------------------------------------
+
+
+def reduction_problem(seed=0, n_samples=700, n_clusters=5, n_features=3):
+    rng = np.random.RandomState(seed)
+    labels = rng.randint(0, n_clusters, n_samples).astype(np.int32)
+    weights = rng.uniform(0.5, 2.0, n_samples)
+    X = np.ascontiguousarray(rng.normal(size=(n_samples, n_features)))
+    return X, labels, weights
+
+
+def test_reduce_dense_matches_the_numpy_oracle():
+    from emeans._kernels._reduce import reduce_dense
+    from emeans._numpy_backend import reduce_batch
+
+    X, labels, weights = reduction_problem()
+    counts, sums = reduce_batch(X, labels, 5, weights)
+    got_counts = np.zeros(5)
+    got_sums = np.zeros((5, 3))
+    reduce_dense(X, labels, weights, got_counts, got_sums, 4)
+    np.testing.assert_allclose(got_counts, counts, rtol=1e-12)
+    np.testing.assert_allclose(got_sums, sums, rtol=1e-12)
+
+
+def test_reduce_csr_matches_the_numpy_oracle():
+    import scipy.sparse as sp
+
+    from emeans._kernels._reduce import reduce_csr
+    from emeans._numpy_backend import reduce_batch
+
+    X, labels, weights = reduction_problem(seed=1)
+    counts, sums = reduce_batch(X, labels, 5, weights)
+    sparse = sp.csr_matrix(X)
+    got_counts = np.zeros(5)
+    got_sums = np.zeros((5, 3))
+    reduce_csr(
+        sparse.data,
+        sparse.indices.astype(np.int32),
+        sparse.indptr.astype(np.int32),
+        labels,
+        weights,
+        got_counts,
+        got_sums,
+        4,
+    )
+    np.testing.assert_allclose(got_counts, counts, rtol=1e-12)
+    np.testing.assert_allclose(got_sums, sums, rtol=1e-12)
+
+
+def test_reduce_ignores_zero_weight_rows():
+    from emeans._kernels._reduce import reduce_dense
+    from emeans._numpy_backend import reduce_batch
+
+    X, labels, weights = reduction_problem(seed=2)
+    weights[:50] = 0.0
+    expected_counts, expected_sums = reduce_batch(X, labels, 5, weights)
+    counts = np.zeros(5)
+    sums = np.zeros((5, 3))
+    reduce_dense(X, labels, weights, counts, sums, 2)
+    np.testing.assert_allclose(counts, expected_counts, rtol=1e-12)
+    np.testing.assert_allclose(sums, expected_sums, rtol=1e-12)

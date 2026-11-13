@@ -3,7 +3,7 @@ py.install_sources(
   subdir: 'emeans/_kernels',
 )
 
-foreach kernel : ['_probe', '_common', '_assign']
+foreach kernel : ['_probe', '_common', '_assign', '_reduce']
   py.extension_module(
     kernel,
     [cython_gen.process(kernel + '.pyx')],
