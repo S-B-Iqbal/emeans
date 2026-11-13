@@ -2,8 +2,8 @@
 
 
 **Phase:** 3 - Cython/OpenMP kernels - **Mode:** ACT (approved with Phase 2)
-**Status:** Phases 1-2 approved and merged to `main` (repo public); P3.1 in
-progress on `phase-3-kernels` (issue #4).
+**Status:** Phase 3 tasks P3.1-P3.6 done on `phase-3-kernels`; gate pending.
+Waiting for `approved phase 3` before merging to `main`.
 
 ## Phase 2 (done)
 - `parametrize_with_checks` green (223 passed / 4 justified xfails, D-041); two real
