@@ -4,7 +4,7 @@
 | Phase | Status | Approved |
 |---|---|---|
 | 0 Plan | done | approved phase 0 (user, Act mode) |
-| 1 NumPy reference | in progress | — |
+| 1 NumPy reference | done, gate pending | — |
 | 2 Compliance | not started | — |
 | 3 Cython/OpenMP | not started | — |
 | 4 Benchmarks | not started | — |
@@ -12,6 +12,22 @@
 | 6 Upstream drafts | not started | — |
 
 ## What works
+- P1.7-P1.10: public API (`predict`, `transform` in Euclidean distances, `score`, `fit_predict`, `fit_transform`, `get_feature_names_out`), streaming `partial_fit` with a frozen constant step (D-014), float32/float64 agreement tests, and the full numpydoc docstring with runnable doctests. 107 unit tests, 109 doctests, 99% coverage, CI green.
+- P1.5/P1.6: `emeans/_compat.py` and `emeans/_emeans.py` - `EMeans.fit` runs the EMA loop (Eq. 2, global t, D-023), revives every `revival_period` updates, resolves `batch_size_`/`alpha0_` (Eq. 6-7), supports init random/k-means++/array, and finalises with last_epoch_mean / slow_ema / None (D-008, D-009); the extra assignment pass (D-018) sets labels_/inertia_. 90 tests, 99% coverage, _emeans.py 100%.
+- P1.4: `emeans/_revival.py` - Eq. 8 splits (delta = 2**-7, D-010), dead mask at
+  tau*mean(N), donors proportional to N without replacement (D-013), min(#dead, #live)
+  per event (D-012), S = c*N write-back, slow state split from its own centroid
+  (D-035); in-place updates, 18 tests.
+- P1.3: `emeans/_numpy_backend.py` — chunked (256-row) assignment with the expanded distance form
+  and lowest-index ties (D-026, D-028), `labels_inertia` in one pass, and the weighted Eq. 3
+  reduction in float64 (D-016); dense **and** CSR through the same entry points, single-pass
+  operations verified against literal difference-form references.
+- P1.2: `emeans/_schedule.py` — `n_updates = T·⌈n/B⌉` (D-004, tail kept) and `alpha(t, M, α0, ε)`
+  for `t = 1..M` (D-003; last step lands exactly on `ε·α0`), plus `alpha_schedule` for tests and
+  Phase 4 plots; shared validators extracted into `emeans/_validation.py`.
+- P1.1: `emeans/_scaling_laws.py` — Eq. 6/7 with the Table 2 constants (3 s.f.), log2-space rounding
+  to a power of two (ties up, D-027), cap at `n`, the `/8` coefficient above 2e6, α0 computed from
+  the resolved B (D-006); 29 tests, 100 % line coverage of the module.
 - GitHub repository `S-B-Iqbal/emeans` (private, D-032) with `origin` configured; `main` holds the
   scaffold commit and `phase-0-plan` the Phase 0 work; labels `phase-0`…`phase-6` created.
 - CI on every push: `.github/workflows/tests.yml` — wheel install and editable install jobs

@@ -12,16 +12,16 @@
 - [x] P0.8 Phase-0 issue (#1) + phase labels created; publishing loop documented (`/publish-progress.md`)
 
 ## Phase 1 — Pure NumPy reference
-- [ ] P1.1 `_scaling_laws.py` + test_scaling_laws.py (Table 2, rounding, cap, n>2M)
-- [ ] P1.2 `_schedule.py` + test_schedule.py (Eq. 5 endpoints, monotone)
-- [ ] P1.3 `_numpy_backend.py` assign + weighted reduce (dense) + tests
-- [ ] P1.4 `_revival.py` + test_revival.py (ΣN conserved, S=c·N, Eq. 8 pattern, donor ∝ N)
-- [ ] P1.5 `EMeans.fit` loop (init random / k-means++ / array; EMA; shuffle per epoch)
-- [ ] P1.6 Finalization: last_epoch_mean / slow_ema / None + test_finalization.py
-- [ ] P1.7 predict / transform / score / fit_predict / fit_transform / get_feature_names_out
-- [ ] P1.8 partial_fit (constant α per Q-012) + test_partial_fit.py
-- [ ] P1.9 Determinism with random_state; float32 preservation tests
-- [ ] P1.10 numpydoc docstring with runnable Examples (doctest green)
+- [x] P1.1 `_scaling_laws.py` + test_scaling_laws.py (Table 2, rounding, cap, n>2M)
+- [x] P1.2 `_schedule.py` + test_schedule.py (Eq. 5 endpoints, monotone)
+- [x] P1.3 `_numpy_backend.py` assign + weighted reduce (dense) + tests
+- [x] P1.4 `_revival.py` + test_revival.py (ΣN conserved, S=c·N, Eq. 8 pattern, donor ∝ N)
+- [x] P1.5 `EMeans.fit` loop (init random / k-means++ / array; EMA; shuffle per epoch)
+- [x] P1.6 Finalization: last_epoch_mean / slow_ema / None + test_finalization.py
+- [x] P1.7 predict / transform / score / fit_predict / fit_transform / get_feature_names_out
+- [x] P1.8 partial_fit (constant α per Q-012) + test_partial_fit.py
+- [x] P1.9 Determinism with random_state; float32 preservation tests
+- [x] P1.10 numpydoc docstring with runnable Examples (doctest green)
 
 ## Phase 2 — Compliance
 - [ ] P2.1 `parametrize_with_checks` green (justified xfails only, logged in decisionLog)

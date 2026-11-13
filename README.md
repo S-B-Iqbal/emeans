@@ -5,8 +5,8 @@
 (in one-tenth the epochs)”*, [arXiv:2611.09501](https://arxiv.org/abs/2611.09501), 6 Nov 2026)
 as a scikit-learn compatible estimator, `EMeans`.
 
-> **Status: pre-alpha.** The package skeleton exists, installs and is covered by CI; the
-> estimator itself lands in Phase 1. Nothing here is usable for clustering yet.
+> **Status: pre-alpha.** `EMeans` fits, predicts and streams (`partial_fit`) in pure NumPy
+> with a test suite and CI; the Cython kernels, benchmarks and packaging are ahead.
 
 ## What the algorithm is
 
@@ -34,7 +34,7 @@ pytest --pyargs emeans -q
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Plan: layout, build system, decisions | done |
-| 1 | Pure NumPy reference implementation + unit tests | in progress |
+| 1 | Pure NumPy reference implementation + unit tests | done |
 | 2 | scikit-learn compliance: `check_estimator`, CSR, `sample_weight` | planned |
 | 3 | Cython + OpenMP kernels, NumPy == Cython equality tests | planned |
 | 4 | Honest CPU benchmarks vs KMeans (lloyd, 25 it) and MiniBatchKMeans | planned |
