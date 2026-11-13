@@ -6,6 +6,8 @@ requires = [
     "meson>=1.2",
     "ninja",
     "numpy>=1.24",
+    "scipy>=1.8",
+    "cython>=3",
 ]
 build-backend = "mesonpy"
 

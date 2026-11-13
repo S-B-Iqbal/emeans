@@ -1,5 +1,6 @@
 python_sources = [
   '__init__.py',
+  '_backend.py',
   '_compat.py',
   '_emeans.py',
   '_numpy_backend.py',
@@ -20,4 +21,5 @@ py.install_sources(
   pure: false,
 )
 
+subdir('_kernels')
 subdir('tests')

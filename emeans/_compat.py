@@ -27,6 +27,7 @@ try:  # pragma: no cover - exercised at import time
     from sklearn.utils import check_array, check_random_state
     from sklearn.utils._openmp_helpers import _openmp_effective_n_threads
     from sklearn.utils._param_validation import Interval, StrOptions
+    from sklearn.utils.parallel import _get_threadpool_controller
     from sklearn.utils.validation import (
         _check_sample_weight,
         check_is_fitted,
@@ -47,6 +48,7 @@ __all__ = [
     "TransformerMixin",
     "_check_sample_weight",
     "_fit_context",
+    "_get_threadpool_controller",
     "_openmp_effective_n_threads",
     "check_array",
     "check_is_fitted",

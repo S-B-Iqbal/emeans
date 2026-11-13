@@ -9,6 +9,7 @@ from numbers import Integral, Real
 import numpy as np
 import scipy.sparse as sp
 
+from emeans import _backend
 from emeans._compat import (
     BaseEstimator,
     ClassNamePrefixFeaturesOutMixin,
@@ -18,6 +19,7 @@ from emeans._compat import (
     TransformerMixin,
     _check_sample_weight,
     _fit_context,
+    _get_threadpool_controller,
     _openmp_effective_n_threads,
     check_array,
     check_is_fitted,
@@ -25,12 +27,7 @@ from emeans._compat import (
     kmeans_plusplus,
     validate_data,
 )
-from emeans._numpy_backend import (
-    assign,
-    distances,
-    labels_inertia,
-    reduce_batch,
-)
+from emeans._numpy_backend import distances, labels_inertia
 from emeans._revival import revive
 from emeans._scaling_laws import auto_alpha0, auto_batch_size
 from emeans._schedule import (
@@ -334,9 +331,15 @@ class EMeans(
                     )
                     epoch_inertia += batch_inertia
                 else:
-                    labels = assign(X[indices], centers)
-                batch_counts, batch_sums = reduce_batch(
-                    X[indices], labels, self.n_clusters, sample_weight[indices]
+                    labels = _backend.assign(
+                        X[indices], centers, n_threads=self._n_threads
+                    )
+                batch_counts, batch_sums = _backend.reduce_batch(
+                    X[indices],
+                    labels,
+                    self.n_clusters,
+                    sample_weight[indices],
+                    n_threads=self._n_threads,
                 )
                 step = alpha_at(t, total_steps, peak, self.alpha_floor_ratio)
                 counts *= 1.0 - step
@@ -379,8 +382,12 @@ class EMeans(
 
     def _last_epoch_mean(self, X, sample_weight, fallback):
         """Average the rows of the last epoch per cluster (D-009)."""
-        counts, sums = reduce_batch(
-            X, self._last_epoch_labels, self.n_clusters, sample_weight
+        counts, sums = _backend.reduce_batch(
+            X,
+            self._last_epoch_labels,
+            self.n_clusters,
+            sample_weight,
+            n_threads=self._n_threads,
         )
         means = np.array(fallback, dtype=np.float64, copy=True)
         filled = counts > 0.0
@@ -419,21 +426,23 @@ class EMeans(
             _check_sample_weight(sample_weight, X, dtype=X.dtype), dtype=np.float64
         )
         self._n_threads = _openmp_effective_n_threads()
+        self._backend = _backend.get_backend()
         n_samples = X.shape[0]
         self.batch_size_, self.alpha0_ = self._resolve_hyperparameters(n_samples)
         self._partial_fit_step = _streaming_step(self)
         centers = self._init_centroids(X, random_state, sample_weight)
         counts = np.full(self.n_clusters, INIT_COUNT, dtype=np.float64)
         sums = counts[:, None] * centers
-        self._fit_emeans(
-            X,
-            sample_weight,
-            counts,
-            sums,
-            self.batch_size_,
-            self.alpha0_,
-            random_state,
-        )
+        with _get_threadpool_controller().limit(limits="sequential_blas_under_openmp"):
+            self._fit_emeans(
+                X,
+                sample_weight,
+                counts,
+                sums,
+                self.batch_size_,
+                self.alpha0_,
+                random_state,
+            )
         final = self._final_centroids(X, sample_weight)
         self.cluster_centers_ = final.astype(X.dtype, copy=False)
         self._n_features_out = self.cluster_centers_.shape[0]
@@ -480,7 +489,11 @@ class EMeans(
             Index of the closest centroid for each row.
         """
         check_is_fitted(self)
-        return assign(self._check_test_data(X), self.cluster_centers_)
+        return _backend.assign(
+            self._check_test_data(X),
+            self.cluster_centers_,
+            n_threads=self._n_threads,
+        )
 
     def transform(self, X):
         """Distances from each row of X to every cluster centre.
@@ -557,6 +570,7 @@ class EMeans(
                     f"{self.n_clusters} on the first partial_fit call."
                 )
             self._n_threads = _openmp_effective_n_threads()
+            self._backend = _backend.get_backend()
             n_rows = X.shape[0]
             self.batch_size_ = n_rows
             if self.alpha0 == "auto":
@@ -577,9 +591,9 @@ class EMeans(
                 self._partial_fit_step = _streaming_step(self)
         step = self._partial_fit_step
         centers = self._sums / self._counts[:, None]
-        labels = assign(X, centers)
-        batch_counts, batch_sums = reduce_batch(
-            X, labels, self.n_clusters, sample_weight
+        labels = _backend.assign(X, centers, n_threads=self._n_threads)
+        batch_counts, batch_sums = _backend.reduce_batch(
+            X, labels, self.n_clusters, sample_weight, n_threads=self._n_threads
         )
         self._counts *= 1.0 - step
         self._counts += step * batch_counts

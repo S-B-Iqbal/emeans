@@ -73,6 +73,7 @@ def test_last_epoch_mean_falls_back_to_the_ema_centroid():
     X = np.array([[0.0, 0.0], [1.0, 0.0], [2.0, 0.0]])
     weights = np.ones(X.shape[0])
     estimator = quick(n_clusters=3)
+    estimator._n_threads = 1  # _last_epoch_mean is called after fit in practice
     # cluster 2 receives no point during the last epoch
     estimator._last_epoch_labels = np.array([0, 0, 1], dtype=np.int32)
     fallback = np.array([[9.0, 9.0], [8.0, 8.0], [7.0, 7.0]])

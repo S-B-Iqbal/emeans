@@ -30,12 +30,12 @@
 - [x] P2.4 Parameter validation messages match sklearn style
 
 ## Phase 3 — Performance
-- [ ] P3.1 `_kernels/_common.pxd` helpers; meson.build with openmp_dep
-- [ ] P3.2 `_assign.pyx` dense + CSR (chunked, prange, GEMM + argmin)
-- [ ] P3.3 `_reduce.pyx` dense + CSR (thread-local buffers)
-- [ ] P3.4 threadpoolctl BLAS limit; `_backend` switch
-- [ ] P3.5 test_backends.py NumPy == Cython
-- [ ] P3.6 Micro-benchmark: Cython vs NumPy path speedup recorded in progress.md
+- [x] P3.1 `_kernels/_common.pxd` helpers; meson.build with openmp_dep
+- [x] P3.2 `_assign.pyx` dense + CSR (chunked, prange, GEMM + argmin)
+- [x] P3.3 `_reduce.pyx` dense + CSR (thread-local buffers)
+- [x] P3.4 threadpoolctl BLAS limit; `_backend` switch
+- [x] P3.5 test_backends.py NumPy == Cython
+- [x] P3.6 Micro-benchmark: Cython vs NumPy path speedup recorded in progress.md
 
 ## Phase 4 — Benchmarks
 - [ ] P4.1 `benchmarks/datasets.py` (blobs, low-d, high n/k, 1–2 embedding sets) with held-out split
