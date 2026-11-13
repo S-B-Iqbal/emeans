@@ -20,7 +20,7 @@
 - [x] P1.6 Finalization: last_epoch_mean / slow_ema / None + test_finalization.py
 - [x] P1.7 predict / transform / score / fit_predict / fit_transform / get_feature_names_out
 - [x] P1.8 partial_fit (constant α per Q-012) + test_partial_fit.py
-- [ ] P1.9 Determinism with random_state; float32 preservation tests
+- [x] P1.9 Determinism with random_state; float32 preservation tests
 - [ ] P1.10 numpydoc docstring with runnable Examples (doctest green)
 
 ## Phase 2 — Compliance

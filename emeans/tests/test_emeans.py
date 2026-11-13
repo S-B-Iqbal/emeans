@@ -207,3 +207,21 @@ def test_predict_rejects_a_different_feature_count():
     estimator = quick().fit(X)
     with pytest.raises(ValueError):
         estimator.predict(np.zeros((5, 7)))
+
+
+def test_float32_and_float64_agree():
+    X64 = blobs()
+    X32 = X64.astype(np.float32)
+    first = quick().fit(X64)
+    second = quick().fit(X32)
+    assert second.inertia_ == pytest.approx(first.inertia_, rel=1e-3)
+    np.testing.assert_allclose(
+        first.cluster_centers_, second.cluster_centers_, rtol=1e-3, atol=1e-3
+    )
+
+
+def test_float32_keeps_the_labels_stable():
+    X64 = blobs()
+    first = quick().fit(X64)
+    second = quick().fit(X64.astype(np.float32))
+    np.testing.assert_array_equal(first.labels_, second.labels_)
