@@ -5,8 +5,7 @@ e-means algorithm (Bessa, Mazaré, Szilvasy, Touvron, Picard, Douze, Jégou,
 "e-means: outperforming k-means (in one-tenth the epochs)", arXiv:2611.09501v1,
 6 Nov 2026).  It is not affiliated with Meta or with the Faiss project.
 
-The public estimator :class:`emeans.EMeans` is added in Phase 1; this module
-currently only exposes the package version.
+The public estimator is :class:`emeans.EMeans`.
 
 Examples
 --------

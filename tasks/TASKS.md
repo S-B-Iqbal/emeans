@@ -21,7 +21,7 @@
 - [x] P1.7 predict / transform / score / fit_predict / fit_transform / get_feature_names_out
 - [x] P1.8 partial_fit (constant α per Q-012) + test_partial_fit.py
 - [x] P1.9 Determinism with random_state; float32 preservation tests
-- [ ] P1.10 numpydoc docstring with runnable Examples (doctest green)
+- [x] P1.10 numpydoc docstring with runnable Examples (doctest green)
 
 ## Phase 2 — Compliance
 - [ ] P2.1 `parametrize_with_checks` green (justified xfails only, logged in decisionLog)
