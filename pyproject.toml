@@ -12,7 +12,7 @@ requires = [
 build-backend = "mesonpy"
 
 [project]
-name = "emeans"
+name = "emeans-cluster"
 dynamic = ["version"]
 description = "e-means: scikit-learn compatible mini-batch k-means with exponential-moving-average centroids"
 readme = "README.md"

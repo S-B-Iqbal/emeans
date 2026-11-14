@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite the paper below."
-title: "emeans: scikit-learn compatible e-means clustering"
+title: "emeans-cluster: scikit-learn compatible e-means clustering"
 abstract: >-
   Independent implementation of e-means (arXiv:2611.09501) as a scikit-learn compatible
   estimator, EMeans.

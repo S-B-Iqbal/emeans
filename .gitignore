@@ -16,6 +16,8 @@ __pycache__/
 .coverage
 htmlcov/
 docs/_build/
+docs/generated/
+docs/sg_execution_times.rst
 docs/auto_examples/
 docs/*.pdf
 .DS_Store
