@@ -22,7 +22,7 @@ from importlib.metadata import version as _distribution_version
 from emeans._emeans import EMeans
 
 try:  # installed (wheel or editable install)
-    __version__ = _distribution_version("emeans")
+    __version__ = _distribution_version("emeans-cluster")
 except PackageNotFoundError:  # pragma: no cover - running from a bare source tree
     __version__ = "0.1.0.dev0"
 

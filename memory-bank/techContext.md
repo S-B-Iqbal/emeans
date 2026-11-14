@@ -40,3 +40,13 @@
   ruff 0.17.4.
 - Benchmarks on this machine will be single-socket laptop numbers; do not compare them to the
   paper's 64-core Xeon + Faiss CPU results (rule 09).
+
+## Phase 5 additions
+- PyPI distribution is `emeans-cluster` (D-052); `pip install -e .` installs it, import stays `emeans`.
+- CI (`.github/workflows/`): `tests.yml` = 3 OS x Python {3.10,3.11,3.12,3.13} + editable +
+  coverage `--cov-fail-under=90` + weekly `nightly-sklearn` (`--pre`), `docs.yml` =
+  `sphinx -W -n`, `wheels.yml` = cibuildwheel (`pypa/cibuildwheel@v2.22`) artefacts only.
+- Docs toolchain: sphinx + numpydoc + sphinx-gallery + pydata-sphinx-theme, `matplotlib` in the
+  `doc` extra; gallery output goes to `docs/generated/` (ignored), sources in `docs/auto_examples/`.
+- OpenMP: Linux only in practice; macOS (clang, D-044) and Windows (MSVC needs the vcomp DLL,
+  D-056) build serial. `emeans._kernels.has_openmp()` reports the truth.

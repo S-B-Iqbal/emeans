@@ -22,6 +22,10 @@ np_dep = declare_dependency(compile_args: ['-I' + incdir_numpy])
 # compiles serial kernels; the probe extension reports which one was built.
 openmp_dep = dependency('OpenMP', language: 'c', required: false)
 
+if host_machine.system() == 'windows'
+  openmp_dep = declare_dependency()
+endif
+
 cython = find_program('cython')
 cython_gen = generator(
   cython,
