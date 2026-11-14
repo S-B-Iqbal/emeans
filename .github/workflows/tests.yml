@@ -57,6 +57,8 @@ jobs:
           python -m pip install -e ".[test]" --no-build-isolation
       - run: python -m pytest --pyargs emeans -q
       - run: python -m pytest --doctest-modules emeans -q
+      - name: Benchmark runner smoke tests
+        run: python -m pytest benchmarks/tests -q
 
   coverage:
     name: coverage gate (ubuntu, 3.10)
