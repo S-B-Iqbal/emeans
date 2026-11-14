@@ -31,6 +31,7 @@ Embedding matrices (d ~ 30-250, often many clusters) are where a scheduled EMA s
 pays off: it reaches the k-means inertia in a few passes over the data.  Timings here
 are single-machine and sorted by method, so read the epochs panel too.
 """
+
 import time
 import matplotlib.pyplot as plt
 import numpy as np
@@ -47,8 +48,14 @@ results = {}
 
 for name, make in [
     ("Lloyd (25 iters)", lambda: KMeans(init="random", n_init=1, max_iter=25, tol=0)),
-    ("MiniBatch (1024)", lambda: MiniBatchKMeans(batch_size=1024, max_no_improvement=None, tol=0)),
-    ("MiniBatch (4096)", lambda: MiniBatchKMeans(batch_size=4096, max_no_improvement=None, tol=0)),
+    (
+        "MiniBatch (1024)",
+        lambda: MiniBatchKMeans(batch_size=1024, max_no_improvement=None, tol=0),
+    ),
+    (
+        "MiniBatch (4096)",
+        lambda: MiniBatchKMeans(batch_size=4096, max_no_improvement=None, tol=0),
+    ),
     # "EMeans", lambda: EMeans(n_clusters=n_clusters),   # once the estimator lands
 ]:
     start = time.perf_counter()

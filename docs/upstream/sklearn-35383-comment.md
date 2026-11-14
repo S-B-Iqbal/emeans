@@ -11,7 +11,7 @@ words. Post only after the user's explicit go-ahead.
 Independent data point for this discussion — not a competing proposal.
 
 While following this issue I wrote an independent implementation of e-means from the paper
-(BSD-3, `pip install emeans-cluster`, import `emeans`) and benchmarked it honestly on one
+(BSD-3, import `emeans`, source: github.com/S-B-Iqbal/emeans) and benchmarked it honestly on one
 laptop. Caveat first: Apple M2 with *serial* kernels (no -fopenmp on Apple clang), so compare
 epochs, not seconds. n_train = 10 000, median of 5 seeds, metric = (MSE - MSE_Lloyd@25)/MSE:
 

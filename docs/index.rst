@@ -20,6 +20,7 @@ package); the import name is `emeans`.
    :maxdepth: 2
 
    generated/examples/index
+   guide
    api
 
 Cite the paper when you use the algorithm; see the repository README for the full citation,
