@@ -72,7 +72,12 @@ Sources
 
 1. Our wall-clock figures come from an **Apple M2 with serial kernels**; theirs come from OpenMP
    wheels. The two are not comparable (Q-033): compare *epochs*, never seconds.
-2. Our measurements are at `n_train = 10 000` with `k = 512`; the laws are fitted for
-   `1e5 ≤ n ≤ 1e8`. Below that range we warn (D-021) and the numbers are extrapolations.
+2. Our headline measurements now come from the P7.1 run, `n_train = 100 000`, `k = 512`,
+   `d = 32/96` — inside the range the laws were fitted on (`B = 8 192`, `alpha0 = 0.733`): one
+   epoch to the Lloyd@25 test MSE in 9 of 10 runs, −33.9 % at `d = 96` after 5 epochs at 1.5 s
+   against Lloyd@25's 2.3 s, and a validation-tuned MiniBatchKMeans still ahead on test MSE at
+   every equal-epoch budget (−47.3 %, 14.0 s). The older `n_train = 10 000` suite is kept in
+   `benchmarks/report.md` as the extrapolation case (D-021 warning) and is no longer quoted in the
+   drafts.
 3. The Faiss column is second-hand: behavioural observations recorded in `docs/REFERENCES.md`
    from the released `contrib/e_means`; no Faiss code was read or copied (rule 05).
