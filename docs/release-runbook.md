@@ -29,6 +29,14 @@ pip install dist/*.whl              # smoke test in a throwaway venv
 python -c "import emeans; from emeans._kernels import has_openmp; print(emeans.__version__, has_openmp())"
 ```
 
+> **Commit the version bump before building.** `meson-python` produces the sdist with
+> `meson dist`, which archives **git HEAD**, not the working tree.  An uncommitted
+> `meson.build` version bump therefore yields a mislabelled artefact: the first 0.1.0 build
+> produced `emeans_cluster-0.1.0.tar.gz` whose *contents* still said `0.1.0.dev0`.  Always
+> commit (or at least `git add`) the bump, then confirm with
+> `tar -xzOf dist/*.tar.gz */meson.build | grep version` and
+> `unzip -p dist/*.whl '*/METADATA' | grep ^Version`.
+
 ## 3. Merge, tag and release (each needs explicit confirmation)
 
 ```bash
