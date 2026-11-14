@@ -1,9 +1,31 @@
 # Active context
 
 
-**Phase:** 7 - scale-up benchmark, release prep, docs guide - **Mode:** ACT (approved by the user)
-**Status:** P7.0-P7.3 done on `phase-7-scaleup`; gate pending. Branch is 5 commits ahead of `main`.
-P7.4 (Q-030 fractional `n_epochs`) and P7.5 (Q-033 macOS OpenMP wheels) are parked pending decisions.
+**Phase:** 8 - evidence hardening - **Mode:** ACT (approved by the user: P8.1, P8.2a, P8.2b, P8.6)
+**Status:** P8.1/P8.2a/P8.2b/P8.6 done on `phase-8-evidence`; gate pending.
+P8.3 (execute the release), P8.4 (Q-030), P8.5 (Q-033) remain parked.
+
+## Phase 8 results
+- **P8.1** every upstream draft now quotes the in-range numbers; the comment is 348 words and points
+  at `github.com/S-B-Iqbal/emeans` instead of a non-existent `pip install`.
+- **P8.2a** `benchmarks/tests/test_run_suite.py` (7 smoke tests) + a CI step; the runner can no longer
+  break silently.  `testpaths` now collects `emeans` and `benchmarks/tests`.
+- **P8.2b** `EMeans.n_revivals_` (public fitted attribute, documented in the docstring, guide and
+  CHANGELOG), recorded in the CSV, with a revival ablation in the `large` run.  **Result: without
+  revival e-means does not beat Lloyd@25 at all** (-33.9 % -> +2.2 % at `d = 96`, -15.5 % -> +1.8 %
+  at `d = 32`, -13.6 % -> +0.8 % on the stress case); 90-280 of 512 clusters are revived per fit.
+- **P8.6** `make_anisotropic` (elongated clusters, Pareto sizes) added to
+  `blobs-96d/32d + aniso-96d`: e-means -13.6 % (non-monotone curve, peaks at epoch 2) against a
+  tuned MiniBatchKMeans at -55.0 %; the stress case is reported as a clear loss at equal budgets.
+- Traps recorded: new files under `emeans/` must be listed in the matching `meson.build`
+  `py.install_sources` (see `techContext.md`); `benchmarks/tests` needs an explicit CI step.
+
+## Outstanding decisions (asked, not answered)
+- **Q-032** (offer `sample_weight` + `partial_fit` upstream) - needed before the #35383 comment is final.
+- Release go-ahead for `git tag -a v0.1.0`, `twine upload -r pypi dist/*`, `gh release create`
+  (all three still unexecuted), and enabling GitHub Pages for `docs-publish.yml`.
+- **Q-030** fractional `n_epochs` (P8.4/P7.4), **Q-033** macOS OpenMP wheels (P8.5/P7.5).
+- Posting any `docs/upstream/` draft still needs a separate explicit go-ahead (rule 01).
 
 ## Phase 7 results
 - **P7.0/P7.3** `docs/guide.rst` (new user guide, in the toctree), `docs-publish.yml` (manual

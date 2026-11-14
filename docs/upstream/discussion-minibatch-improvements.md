@@ -22,10 +22,12 @@ the *step schedule* and the *finalization*, not the estimator.
 | 4 | **Split-based revival** for under-used clusters: split the largest donor along the BF16-epsilon pattern (Eq. 8) instead of re-drawing random samples from the batch | `reassignment_ratio`: `to_reassign = counts < reassignment_ratio * counts.max()`, at most `0.5 · batch_size` clusters, new centres drawn **uniformly at random from the batch** (`_kmeans.py`, `_mini_batch_step`) | new parameter (e.g. `revival="off" | "split"`), default `"off"` |
 
 Proposals 1 and 2 are the ones with measured support; 3 is a convenience whose benefit is
-invisible below ~1e5 rows; 4 addresses dead clusters that `reassignment_ratio` handles poorly on
-skewed data (paper App. H.2, Table 14), but we have not measured it against
-`reassignment_ratio` on sklearn's own benchmarks — that would be part of the PR discussion, not
-something to assert.
+invisible below ~1e5 rows; 4 now also has measured support: with the revival switched off,
+e-means lands **within ~2 % of Lloyd@25** after five epochs (`+2.2 %` at `d = 96`, `+1.8 %` at
+`d = 32`, `+0.8 %` on the skewed stress case) instead of 13.6–33.9 % below it, and most seeds never
+reach the reference budget at all.  We have not compared split revival against
+`reassignment_ratio` head-to-head on sklearn's own benchmarks, so the claim is "the mechanism is
+worth testing", not "this implementation of it is better than yours".
 
 ## Evidence to quote (and its limits)
 
