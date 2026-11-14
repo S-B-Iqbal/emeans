@@ -50,7 +50,9 @@
 - [x] P5.4 Exact gh/git commands printed — NOT executed
 
 ## Phase 6 — Upstream drafts (saved in docs/upstream/, never posted)
-- [ ] P6.1 scikit-learn-contrib inclusion request
-- [ ] P6.2 Comment for scikit-learn issue #35383
-- [ ] P6.3 Discussion text on MiniBatchKMeans improvements
-- [ ] P6.4 MiniBatchKMeans PR sketch (files, params, back-compat, tests)
+- [x] P6.0 `docs/upstream/parity-matrix.md` (paper vs this package vs sklearn-contrib-emeans 0.3.1 vs Faiss)
+- [x] P6.1 scikit-learn-contrib inclusion request
+- [x] P6.2 Comment for scikit-learn issue #35383
+- [x] P6.3 Discussion text on MiniBatchKMeans improvements
+- [x] P6.4 MiniBatchKMeans PR sketch (files, params, back-compat, tests)
+- [x] P6.5 User-example sketch: clustering embeddings (`examples/cluster/`)

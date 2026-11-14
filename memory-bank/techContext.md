@@ -48,5 +48,11 @@
   `sphinx -W -n`, `wheels.yml` = cibuildwheel (`pypa/cibuildwheel@v2.22`) artefacts only.
 - Docs toolchain: sphinx + numpydoc + sphinx-gallery + pydata-sphinx-theme, `matplotlib` in the
   `doc` extra; gallery output goes to `docs/generated/` (ignored), sources in `docs/auto_examples/`.
+- Linux wheels are built on `manylinux_2_28` (`[tool.cibuildwheel.linux]`): manylinux2014's pip
+  cannot resolve a scipy wheel for every supported CPython and falls back to a source build, which
+  fails on a missing OpenBLAS. Same image scikit-learn uses. `wheels.yml` runs on `main` pushes and
+  on `workflow_dispatch` (useful for validating a fix on a branch without merging).
 - OpenMP: Linux only in practice; macOS (clang, D-044) and Windows (MSVC needs the vcomp DLL,
   D-056) build serial. `emeans._kernels.has_openmp()` reports the truth.
+- `docs/upstream/*.md` (Phase 6 drafts) are Markdown and deliberately not linked from
+  `docs/index.rst`, so Sphinx builds never pick them up.

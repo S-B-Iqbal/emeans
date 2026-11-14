@@ -8,10 +8,22 @@
 | 2 Compliance | done | approved phase 2 (user, Act mode) |
 | 3 Cython/OpenMP | done | approved phase 3 (user) |
 | 4 Benchmarks | done | approved phase 4 (user) |
-| 5 Packaging | done, gate pending | — |
-| 6 Upstream drafts | not started | — |
+| 5 Packaging | done | approved phase 5 (user, option A `emeans-cluster`) |
+| 6 Upstream drafts | done, gate pending | — |
 
 ## What works
+- Wheels verified on all three operating systems (`wheels.yml`, 2026-11-14): `cibuildwheel` jobs
+  for ubuntu/macos/windows all green, artefacts `wheels-{ubuntu,macos,windows}-latest` uploaded,
+  and the wheel self-test reports `openmp: True` on Linux, `False` on macOS and `False` on Windows
+  (D-053/D-059). Linux builds run on `manylinux_2_28` after manylinux2014 failed to resolve a
+  scipy wheel (D-059).
+- P6.0-P6.5: six drafts under `docs/upstream/` (parity matrix vs paper/`sklearn-contrib-emeans` 0.3.1/Faiss;
+  contrib inclusion request with the four gaps stated; a <=350-word comment for scikit-learn #35383
+  quoting our serial-CPU numbers *including* the losses; a MiniBatchKMeans improvement discussion
+  written against the real code in `_ref/scikit-learn`; a PR sketch (API, files, tests, back-compat);
+  and a user-example skeleton for embedding clustering, which is what `betatim` asked for).
+  **Nothing posted**: rule 01/10. Four open questions Q-030-Q-033 (fractional `n_epochs`, naming,
+  offering `sample_weight`/`partial_fit` upstream, OpenMP wheels) are filed with proposed defaults.
 - P5.1-P5.4: distribution renamed to **emeans-cluster** (D-052, import stays `emeans`), CHANGELOG + README with the benchmark table, Sphinx/numpydoc/sphinx-gallery docs (`sphinx -W -n` green), CI matrix 3 OS x Python 3.10-3.13 + docs + coverage + nightly scikit-learn + cibuildwheel artefacts, and `docs/release-runbook.md` (printed only). Two CI defects fixed: gallery sources were gitignored, and MSVC OpenMP linked a missing vcomp DLL (D-056: Windows builds serial now).
 - P4.1-P4.4: `benchmarks/` suite (datasets, harness, runner, plots, report). EMeans reaches the Lloyd@25 test MSE in **2-4 epochs** on the blob datasets (-3.2% at d=32, -19.8% at d=96, median of 5 seeds) but **loses to a validation-swept MiniBatchKMeans on 3 of 4 datasets and to Lloyd on wall-clock (~2x slower serial); the high-n/k and low-d configurations are documented losses. Raw CSV + 3 PNGs + `report.md` committed.
 - P3.1-P3.6: compiled kernels live. `_assign.pyx` (chunked OpenMP assignment, dense + CSR) and `_reduce.pyx` (thread-local weighted reduction) verify bit-exactly against the NumPy oracle; `_backend.py` dispatches to Cython by default (D-051), BLAS limited to one thread (closes D-038). OpenMP is optional (D-044): local builds are serial, CI reports `True 4`. Micro-benchmark (n=20000, k=64, d=32, 1 epoch, 40 updates): NumPy 0.050 s vs Cython 0.015 s -> **3.3x serial**, identical inertia. 269 tests, 4 xfailed.
