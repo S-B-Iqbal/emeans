@@ -30,3 +30,11 @@ cython_gen = generator(
 )
 
 subdir('emeans')
+
+# MSVC links its OpenMP runtime (vcomp) dynamically, which is not present on a bare
+# Windows machine, so a source install of the wheel fails to import the kernels
+# (D-056).  Windows therefore builds serial; Linux keeps OpenMP and macOS never has it
+# (Apple clang rejects -fopenmp).
+if host_machine.system() == 'windows'
+  openmp_dep = declare_dependency()
+endif
