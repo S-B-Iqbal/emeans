@@ -1,9 +1,9 @@
 # Active context
 
 
-**Phase:** 3 - Cython/OpenMP kernels - **Mode:** ACT (approved with Phase 2)
-**Status:** Phase 3 tasks P3.1-P3.6 done on `phase-3-kernels`; gate pending.
-Waiting for `approved phase 3` before merging to `main`.
+**Phase:** 4 - Benchmarks - **Mode:** ACT (approved with Phase 3)
+**Status:** Phase 4 tasks P4.1-P4.4 done on `phase-4-bench`; gate pending.
+Waiting for `approved phase 4` before merging to `main`.
 
 ## Phase 2 (done)
 - `parametrize_with_checks` green (223 passed / 4 justified xfails, D-041); two real

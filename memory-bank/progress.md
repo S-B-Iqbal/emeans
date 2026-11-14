@@ -6,12 +6,13 @@
 | 0 Plan | done | approved phase 0 (user, Act mode) |
 | 1 NumPy reference | done | approved phase 1 (user, Act mode) |
 | 2 Compliance | done | approved phase 2 (user, Act mode) |
-| 3 Cython/OpenMP | done, gate pending | — |
-| 4 Benchmarks | not started | — |
+| 3 Cython/OpenMP | done | approved phase 3 (user) |
+| 4 Benchmarks | done, gate pending | — |
 | 5 Packaging | not started | — |
 | 6 Upstream drafts | not started | — |
 
 ## What works
+- P4.1-P4.4: `benchmarks/` suite (datasets, harness, runner, plots, report). EMeans reaches the Lloyd@25 test MSE in **2-4 epochs** on the blob datasets (-3.2% at d=32, -19.8% at d=96, median of 5 seeds) but **loses to a validation-swept MiniBatchKMeans on 3 of 4 datasets and to Lloyd on wall-clock (~2x slower serial); the high-n/k and low-d configurations are documented losses. Raw CSV + 3 PNGs + `report.md` committed.
 - P3.1-P3.6: compiled kernels live. `_assign.pyx` (chunked OpenMP assignment, dense + CSR) and `_reduce.pyx` (thread-local weighted reduction) verify bit-exactly against the NumPy oracle; `_backend.py` dispatches to Cython by default (D-051), BLAS limited to one thread (closes D-038). OpenMP is optional (D-044): local builds are serial, CI reports `True 4`. Micro-benchmark (n=20000, k=64, d=32, 1 epoch, 40 updates): NumPy 0.050 s vs Cython 0.015 s -> **3.3x serial**, identical inertia. 269 tests, 4 xfailed.
 - P2.1-P2.4: `parametrize_with_checks` green for explicit and auto configs (223 passed / 4 justified xfails, D-041); dense == CSR equivalence; sample_weight exactness in the alpha0 = 1 regime plus a statistical repeated-rows test; validation and warning surface pinned. Two real bugs fixed (D-042, D-043). 248 passed, 4 xfailed, 99% coverage.
 - P1.7-P1.10: public API (`predict`, `transform` in Euclidean distances, `score`, `fit_predict`, `fit_transform`, `get_feature_names_out`), streaming `partial_fit` with a frozen constant step (D-014), float32/float64 agreement tests, and the full numpydoc docstring with runnable doctests. 107 unit tests, 109 doctests, 99% coverage, CI green.

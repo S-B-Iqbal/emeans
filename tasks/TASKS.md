@@ -38,10 +38,10 @@
 - [x] P3.6 Micro-benchmark: Cython vs NumPy path speedup recorded in progress.md
 
 ## Phase 4 — Benchmarks
-- [ ] P4.1 `benchmarks/datasets.py` (blobs, low-d, high n/k, 1–2 embedding sets) with held-out split
-- [ ] P4.2 epochs-to-Lloyd@25 (0.2-epoch steps), ≥5 seeds
-- [ ] P4.3 test MSE vs wall-clock plots; MiniBatchKMeans swept on validation
-- [ ] P4.4 `benchmarks/report.md` incl. hardware, versions, losing cases
+- [x] P4.1 `benchmarks/datasets.py` (blobs, low-d, high n/k, 1–2 embedding sets) with held-out split
+- [x] P4.2 epochs-to-Lloyd@25 (0.2-epoch steps), ≥5 seeds
+- [x] P4.3 test MSE vs wall-clock plots; MiniBatchKMeans swept on validation
+- [x] P4.4 `benchmarks/report.md` incl. hardware, versions, losing cases
 
 ## Phase 5 — Packaging & GitHub
 - [ ] P5.1 README (citation, BibTeX, not-affiliated note), LICENSE (BSD-3), CITATION.cff, CHANGELOG
