@@ -1,55 +1,37 @@
 # Active context
 
 
-**Phase:** 4 - Benchmarks - **Mode:** ACT (approved with Phase 3)
-**Status:** Phase 4 tasks P4.1-P4.4 done on `phase-4-bench`; gate pending.
-Waiting for `approved phase 4` before merging to `main`.
+**Phase:** 5 - Packaging - **Mode:** ACT (approved with Phase 4)
+**Status:** P5.1-P5.4 done on `phase-5-packaging` (5 commits); gate report posted in issue #6.
+Waiting for `approved phase 5` before merging to `main`.
 
-## Phase 2 (done)
-- `parametrize_with_checks` green (223 passed / 4 justified xfails, D-041); two real
-  bugs fixed (D-042, D-043); dense == CSR, sample_weight and validation suites added.
+## Phase 5 (done, gate pending)
+- P5.1 distribution renamed to **`emeans-cluster`** (D-052; import stays `emeans`), CHANGELOG,
+  README rewritten (install, quickstart, API, benchmark table incl. losses), CITATION.
+- P5.2 `docs/`: conf.py + index.rst + api.rst + `auto_examples/plot_emeans_quickstart.py`;
+  gate is `sphinx -W -n` (clean locally and in CI).
+- P5.3 CI: `tests.yml` (3 OS x py3.10-3.13 matrix, editable, coverage >=90%, nightly sklearn),
+  `docs.yml`, `wheels.yml` (cibuildwheel artefacts only). 14/14 test jobs green.
+- P5.4 `docs/release-runbook.md`: bump, build, twine check, tag, upload, yank — printed, never run.
+- Fixes found by CI: gallery sources were gitignored; MSVC OpenMP linked a missing vcomp DLL
+  (D-056 - Windows builds serial; the meson override had to sit above `subdir('emeans')`).
 
-## Phase 1 (done)
-107 unit tests, 109 doctests, 99% coverage, CI green (wheel + editable jobs).
-Modules: `_scaling_laws` (Eq. 6-7), `_schedule` (Eq. 5), `_numpy_backend`
-(Eq. 1/3, dense + CSR), `_revival` (App. H.1), `_compat`, `_validation`,
-`_emeans` (`EMeans`: fit, finalization, public API, partial_fit).
+## Phases 1-4 (done, merged)
+- P1 pure NumPy reference: 107 tests, 109 doctests, 99% coverage.
+- P2 compliance: `parametrize_with_checks` green (4 justified xfails, D-041).
+- P3 Cython/OpenMP kernels + `_backend` switch (D-044/D-045/D-046).
+- P4 benchmarks: `benchmarks/report.md` + CSV + 3 plots; e-means hits Lloyd@25 in 2-4 epochs,
+  loses to a tuned MiniBatchKMeans on 3/4 laptop configs.
+- `main` = `908f82b` (Phase 4 merge).
 
-## Phase 3 plan (approved)
-Issue #4, branch `phase-3-kernels`. OpenMP is optional (D-044): Apple clang has
-no `-fopenmp`, so the local build is serial while CI exercises the parallel path.
-
-- P3.1 `emeans/_kernels/`: `_common.pxd` (helpers citing sklearn `_k_means_common.pxd`),
-  `meson.build` with `np_dep` + `openmp_dep`; root `meson.build` gains the Cython
-  generator; build proof with a dummy extension.
-- P3.2 `_assign.pyx`: `floating` fused type, CHUNK_SIZE = 256, chunked
-  `prange(nogil=True, num_threads=n_threads)`, `dgemm` (from
-  `scipy.linalg.cython_blas`) + `||x||^2 + ||c||^2` + argmin with strict `<`;
-  dense and CSR variants.
-- P3.3 `_reduce.pyx`: per-thread `(k,)` counts and `(k, d)` sums, final float64
-  reduction, dense and CSR.
-- P3.4 `emeans/_backend.py`: `get_backend`/`set_backend` dispatching assign, reduce,
-  distances, labels_inertia; the estimator keeps a private `self._backend`; the
-  training loop is wrapped in `_get_threadpool_controller().limit(...)` (D-038).
-- P3.5 `test_backends.py`: NumPy == Cython (identical labels, allclose counts/sums)
-  over dense/CSR x float32/float64.
-- P3.6 micro-benchmark recorded in `progress.md` (serial locally, OpenMP in CI).
-
-Decisions: D-044 (optional OpenMP), D-045 (fused type but float64 dispatch),
-D-046 (module-level switch, no new public parameter).
-
-## Publishing (D-030…D-034)
-- `origin` = `S-B-Iqbal/emeans` (private until the Phase 1 gate, then public — D-032); loop defined
-  in `.clinerules/workflows/publish-progress.md`: push after every green task, tick the phase issue,
-  merge to `main` only after a gate is approved.
-- CI: `.github/workflows/tests.yml` (ubuntu, py3.10) on every push (D-034); full matrix in Phase 5.
-  Green on `fix(ci): keep editable installs non-isolated…` (the very first run exposed the
-  meson-python editable/build-isolation trap).
-- Phase 0.6 (repo creation, LICENSE/README/CITATION, CI) is tracked as P0.6–P0.8 in `TASKS.md` and
-  in issue #1.
+## Phase 6 (next, drafts only, never posted)
+contrib inclusion request + comment for scikit-learn#35383 + Discussion + MiniBatchKMeans PR
+sketch, saved under `docs/upstream/`.
 
 ## Notes for the next session
-- Unit tests must stay fast: pass explicit `batch_size`/`n_epochs` rather than `"auto"` where
-  the resolved batch size would be large.
-- Repo-local git identity is `S-B-Iqbal <28038429+S-B-Iqbal@users.noreply.github.com>` (D-031) and
-  pushing to `origin` is pre-authorised (D-030); tags, releases, PyPI and other repositories are not.
+- Unit tests must stay fast: pass explicit `batch_size`/`n_epochs` rather than `"auto"`.
+- Repo-local git identity `S-B-Iqbal <28038429+S-B-Iqbal@users.noreply.github.com>` (D-031);
+  pushing `origin` branches is pre-authorised (D-030). Tags, `gh release`, PyPI upload,
+  visibility changes and any write to another repository need explicit confirmation each time.
+- Generated docs output (`docs/generated/`, `docs/sg_execution_times.rst`) is gitignored;
+  `docs/auto_examples/` holds the sources and is tracked.
