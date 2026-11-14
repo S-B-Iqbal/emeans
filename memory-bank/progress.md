@@ -12,6 +12,11 @@
 | 6 Upstream drafts | done, gate pending | — |
 
 ## What works
+- Wheels verified on all three operating systems (`wheels.yml`, 2026-11-14): `cibuildwheel` jobs
+  for ubuntu/macos/windows all green, artefacts `wheels-{ubuntu,macos,windows}-latest` uploaded,
+  and the wheel self-test reports `openmp: True` on Linux, `False` on macOS and `False` on Windows
+  (D-053/D-059). Linux builds run on `manylinux_2_28` after manylinux2014 failed to resolve a
+  scipy wheel (D-059).
 - P6.0-P6.5: six drafts under `docs/upstream/` (parity matrix vs paper/`sklearn-contrib-emeans` 0.3.1/Faiss;
   contrib inclusion request with the four gaps stated; a <=350-word comment for scikit-learn #35383
   quoting our serial-CPU numbers *including* the losses; a MiniBatchKMeans improvement discussion
