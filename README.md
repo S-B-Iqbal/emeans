@@ -34,9 +34,9 @@ import numpy as np
 from emeans import EMeans
 
 X = np.random.RandomState(0).normal(size=(20_000, 64))
-model = EMeans(n_clusters=256).fit(X)   # batch size and step come from the scaling laws
+model = EMeans(n_clusters=256).fit(X)  # batch size and step come from the scaling laws
 print(model.n_iter_, model.n_steps_, model.inertia_)
-labels = model.labels_        # identical to model.predict(X)
+labels = model.labels_  # identical to model.predict(X)
 centers = model.cluster_centers_
 ```
 
@@ -71,8 +71,23 @@ schedule, dead-cluster revival and a last-epoch-mean finalization.
 
 ## Benchmarks (honest)
 
-Measured on a laptop (Apple M2, 8 cores, serial kernels), `n_train = 10 000`, median of 5
-seeds, test MSE relative to Lloyd@25 (negative is better):
+Measured on a laptop (Apple M2, 8 cores, **serial** kernels), median of 5 seeds, test MSE
+relative to `KMeans(init="random", max_iter=25, tol=0)` (negative is better).
+
+**Inside the fitted range** (`n_train = 100 000`, `k = 512`, so the automatic batch size and step
+are used as intended: `B = 8 192`, `alpha0 = 0.733`):
+
+| dataset | epochs to Lloyd@25 | EMeans@1 | EMeans@5 | worst seed | tuned MiniBatch@5 | EMeans s | MiniBatch s |
+|---|---|---|---|---|---|---|---|
+| blobs-96d | 1.0 (5/5 seeds) | -19.0% | **-33.9%** | -28.5% | -47.3% | 1.5 | 14.0 |
+| blobs-32d | 1.0 (4/5 seeds) | -8.3% | -15.5% | -13.1% | -41.1% | 1.0 | 7.5 |
+
+e-means reaches the Lloyd@25 test MSE in **one epoch** here (the paper reports 1.4-2.6), is
+**faster** than Lloyd@25 (1.5 s vs 2.3 s at `d = 96`), and dimension still drives the win.  It
+still loses to a validation-tuned MiniBatchKMeans on test MSE at equal epochs, and at `d = 32` it
+loses at equal time as well; at `d = 96` it matches MiniBatch@1's quality in 2.7x less time.
+
+**Below the fitted range** (the original `n_train = 10 000` suite, kept for continuity):
 
 | dataset | k | d | epochs to Lloyd@25 | EMeans at 5 epochs | worst seed |
 |---|---|---|---|---|---|
@@ -81,11 +96,12 @@ seeds, test MSE relative to Lloyd@25 (negative is better):
 | high-n/k | 20 | 16 | 1.0 | +0.0% | +46.0% |
 | low-d | 32 | 2 | 4.0 | -2.5% | -0.1% |
 
-EMeans reaches the Lloyd@25 test MSE in 2-4 epochs and does best in higher dimension, but a
-validation-swept MiniBatchKMeans beats it on 3 of 4 configurations at this scale, the
-high-`n/k` setting is a loss, and it is ~2x slower than Lloyd@25 in wall-clock here.  Full
-protocol, all configurations and the deviations from the paper are in
-[`benchmarks/report.md`](benchmarks/report.md); raw data in `benchmarks/results/suite.csv`.
+At that scale a validation-swept MiniBatchKMeans beat EMeans on 3 of 4 configurations and EMeans
+was ~2x slower than Lloyd@25 - the small-scale result did not generalise to `n = 100 000`.
+
+Full protocol, all configurations and the deviations from the paper are in
+[`benchmarks/report.md`](benchmarks/report.md); raw data in `benchmarks/results/{large,suite}.csv`;
+figures in `benchmarks/plots/<stem>/`.
 
 ## Not affiliated
 
@@ -118,8 +134,8 @@ pip install -e . --no-build-isolation   # editable install (kernels compile here
 pytest --pyargs emeans -q                # unit tests (includes the sklearn check suite)
 pytest --doctest-modules emeans -q       # doctests
 pre-commit run --all-files               # ruff + cython-lint + hygiene
-python benchmarks/run_suite.py          # benchmark suite -> benchmarks/results/suite.csv
-python benchmarks/plots.py              # figures -> benchmarks/plots/
+python benchmarks/run_suite.py large     # benchmark suite inside the fitted range (P7.1)
+python benchmarks/plots.py suite large   # figures -> benchmarks/plots/<stem>/
 # python -m sphinx -W -n -b html docs docs/_build/html      # documentation
 ```
 

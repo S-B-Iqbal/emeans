@@ -10,9 +10,21 @@
 | 4 Benchmarks | done | approved phase 4 (user) |
 | 5 Packaging | done | approved phase 5 (user, option A `emeans-cluster`) |
 | 6 Upstream drafts | done | approved phase 6 (user, option B; merged `d7786c8`) |
-| 7 (proposed) | not started | awaiting approval — see `activeContext.md` |
+| 7 Scale-up, release prep, guide | done, gate pending | — |
 
 ## What works
+- P7.0-P7.3: the benchmark now runs **inside the fitted range** (`benchmarks/run_suite.py large`,
+  `n_train = 100 000`, `k = 512`, `d = 32/96`, `B = 8 192`, `alpha0 = 0.733`) with the
+  MiniBatchKMeans sweep repeated at every epoch budget so both methods are compared at equal
+  epochs. Headline: e-means reaches the Lloyd@25 test MSE in **one epoch** (9/10 seeds; paper
+  1.4-2.6), is **faster** than Lloyd@25 (1.5 s vs 2.3 s at d=96) and ends **-33.9%** below it at
+  d=96 after 5 epochs, but a validation-tuned MiniBatchKMeans still wins on test MSE at equal
+  epochs (-47.3%) and at d=32 wins at equal time too - all reported in `report.md`/README. Also:
+  user guide page (`docs/guide.rst`), a manual `docs-publish.yml` workflow (Pages must be enabled
+  by the user), and the 0.1.0 release prepared (`python -m build`, `twine check` PASSED, wheel
+  installs from a clean venv and reports `0.1.0`). Two more traps recorded: `meson dist` archives
+  git HEAD, so an uncommitted version bump mislabels the sdist; and `ruff format` also formats
+  Python inside Markdown.
 - Wheels verified on all three operating systems (`wheels.yml`, 2026-11-14): `cibuildwheel` jobs
   for ubuntu/macos/windows all green, artefacts `wheels-{ubuntu,macos,windows}-latest` uploaded,
   and the wheel self-test reports `openmp: True` on Linux, `False` on macOS and `False` on Windows

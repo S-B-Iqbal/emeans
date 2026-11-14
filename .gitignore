@@ -23,3 +23,4 @@ docs/*.pdf
 benchmarks/data/
 benchmarks/results/raw/
 datasets/
+benchmarks/results/quick.csv

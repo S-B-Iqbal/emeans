@@ -1,7 +1,14 @@
 # SPDX-License-Identifier: BSD-3-Clause
-"""Run the benchmark suite and write ``benchmarks/results/suite.csv`` (P4.1-P4.2).
+"""Run the benchmark suite and write ``benchmarks/results/*.csv`` (P4.1-P4.2, P7.1).
 
-Usage: python benchmarks/run_suite.py [quick]
+Usage: python benchmarks/run_suite.py [quick|suite|large]
+
+- ``quick`` writes ``results/quick.csv`` (smoke test, 1 seed).
+- ``suite`` writes ``results/suite.csv``: the original four datasets at
+  ``n_train = 10 000``, i.e. **below** the range the scaling laws were fitted on.
+- ``large`` writes ``results/large.csv``: ``n_train = 100 000``, ``d = 32/96`` and
+  ``k = 512``, inside the fitted range (``1e5 <= n <= 1e8``, Sec. 4.1 / App. B.1),
+  with a wider MiniBatchKMeans sweep.
 
 Every configuration records the Lloyd@25 reference (rule 09), EMeans at integer
 epoch budgets and the MiniBatchKMeans sweep selected on validation.  EMeans uses the
@@ -32,6 +39,29 @@ QUICK = [
     ("blobs-32d-k64", lambda: make_blobs(4000, 32, 64, seed=0), 64, 2),
 ]
 
+# 120 000 points minus the 20 000 held out gives n_train = 100 000 and k = 512, so
+# n / k = 195 >= 8 and n is inside the range the Table 2 laws were fitted on.  The
+# resolver returns B = 8 192 and alpha0 = 0.733 here, against B = 1 024 and
+# alpha0 = 0.318 at n_train = 10 000.
+LARGE = [
+    ("blobs-96d-n100k-k512", lambda: make_blobs(120_000, 96, 512, seed=1), 512, 5),
+    ("blobs-32d-n100k-k512", lambda: make_blobs(120_000, 32, 512, seed=1), 512, 5),
+]
+
+# MiniBatchKMeans sweeps: the batch sizes must scale with n for the comparison to be
+# fair at 1e5 (the paper sweeps up to 524 288 at 1e9 scale, App. C).
+SWEEP_BATCH_SIZES = {
+    "quick": (256, 1024),
+    "suite": (256, 1024, 4096),
+    "large": (1024, 8192, 65536),
+}
+
+MODES = {
+    "quick": (QUICK, [0], "quick", False),
+    "suite": (CONFIGS, list(range(5)), "suite", False),
+    "large": (LARGE, list(range(5)), "large", True),
+}
+
 
 FIELDS = [
     "dataset",
@@ -48,8 +78,20 @@ FIELDS = [
 ]
 
 
-def run(configs, seeds, out_path):
-    """Run every configuration and seed, and return the list of CSV rows."""
+def run(
+    configs,
+    seeds,
+    out_path,
+    batch_sizes=(256, 1024, 4096),
+    minibatch_per_budget=False,
+):
+    """Run every configuration and seed, and return the list of CSV rows.
+
+    ``minibatch_per_budget`` sweeps MiniBatchKMeans once per epoch budget instead of
+    once at ``max_epochs``, so its rows can be compared with EMeans at equal epochs
+    (P7.1).  It multiplies the sweep cost by ``max_epochs``, so the original
+    ``suite`` numbers are left untouched.
+    """
     rows = []
     for name, factory, n_clusters, max_epochs in configs:
         X = factory()
@@ -96,27 +138,34 @@ def run(configs, seeds, out_path):
                     }
                 )
 
-            start = time.perf_counter()
-            _, batch_size, ratio, centres = minibatch_sweep(
-                X_train, X_val, n_clusters, seed, max_iter=max_epochs
-            )
-            seconds = time.perf_counter() - start
-            test = mse(X_test, centres)
-            rows.append(
-                {
-                    "dataset": name,
-                    "n_train": X_train.shape[0],
-                    "n_clusters": n_clusters,
-                    "n_features": X_train.shape[1],
-                    "seed": seed,
-                    "method": f"minibatch({batch_size},{ratio})",
-                    "epochs": max_epochs,
-                    "val_mse": mse(X_val, centres),
-                    "test_mse": test,
-                    "rel_test_mse": relative_mse(test, ref_test),
-                    "seconds": seconds,
-                }
-            )
+            budgets = range(1, max_epochs + 1) if minibatch_per_budget else [max_epochs]
+            for budget in budgets:
+                start = time.perf_counter()
+                _, batch_size, ratio, centres = minibatch_sweep(
+                    X_train,
+                    X_val,
+                    n_clusters,
+                    seed,
+                    max_iter=budget,
+                    batch_sizes=batch_sizes,
+                )
+                seconds = time.perf_counter() - start
+                test = mse(X_test, centres)
+                rows.append(
+                    {
+                        "dataset": name,
+                        "n_train": X_train.shape[0],
+                        "n_clusters": n_clusters,
+                        "n_features": X_train.shape[1],
+                        "seed": seed,
+                        "method": f"minibatch({batch_size},{ratio})",
+                        "epochs": budget,
+                        "val_mse": mse(X_val, centres),
+                        "test_mse": test,
+                        "rel_test_mse": relative_mse(test, ref_test),
+                        "seconds": seconds,
+                    }
+                )
     RESULTS.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=FIELDS)
@@ -152,11 +201,18 @@ def summarise(rows):
 
 def main():
     warnings.simplefilter("ignore", UserWarning)  # the D-021 range notice
-    quick = len(sys.argv) > 1 and sys.argv[1] == "quick"
-    configs = QUICK if quick else CONFIGS
-    seeds = [0] if quick else list(range(5))
-    out = RESULTS / ("quick.csv" if quick else "suite.csv")
-    rows = run(configs, seeds, out)
+    mode = sys.argv[1] if len(sys.argv) > 1 else "suite"
+    if mode not in MODES:
+        raise SystemExit(f"mode must be one of {sorted(MODES)}, got {mode!r}")
+    configs, seeds, stem, per_budget = MODES[mode]
+    out = RESULTS / f"{stem}.csv"
+    rows = run(
+        configs,
+        seeds,
+        out,
+        batch_sizes=SWEEP_BATCH_SIZES[mode],
+        minibatch_per_budget=per_budget,
+    )
     summarise(rows)
     print(f"wrote {out} ({len(rows)} rows)")
 
