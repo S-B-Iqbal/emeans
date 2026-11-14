@@ -1,11 +1,13 @@
 # SPDX-License-Identifier: BSD-3-Clause
-"""Plots for the benchmark report (Phase 4, task P4.3).
+"""Plots for the benchmark report (Phase 4, task P4.3; one result set per CSV in P7.1).
 
-Reads ``benchmarks/results/suite.csv`` and writes PNGs into ``benchmarks/plots/``.
+Reads ``benchmarks/results/<stem>.csv`` and writes PNGs into
+``benchmarks/plots/<stem>/``.  Usage: ``python benchmarks/plots.py [suite] [large]``.
 """
 
 import csv
 import statistics
+import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -135,14 +137,18 @@ def plot_vs_time(rows, out_dir):
 
 
 def main():
-    rows = load()
-    PLOTS.mkdir(parents=True, exist_ok=True)
-    for path in (
-        plot_epochs(rows, PLOTS),
-        plot_vs_epochs(rows, PLOTS),
-        plot_vs_time(rows, PLOTS),
-    ):
-        print("wrote", path)
+    """Plot every CSV given on the command line, or ``results/suite.csv`` by default."""
+    stems = sys.argv[1:] or ["suite"]
+    for stem in stems:
+        rows = load(RESULTS / f"{stem}.csv")
+        out_dir = PLOTS / stem
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for path in (
+            plot_epochs(rows, out_dir),
+            plot_vs_epochs(rows, out_dir),
+            plot_vs_time(rows, out_dir),
+        ):
+            print("wrote", path)
 
 
 if __name__ == "__main__":
