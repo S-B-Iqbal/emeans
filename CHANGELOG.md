@@ -6,7 +6,7 @@ All notable changes to this project are documented here.  The format follows
 
 ## [Unreleased]
 
-## [0.1.0] - not yet released
+## [0.1.0] - 2026-11-14
 
 First complete implementation of e-means as a scikit-learn compatible estimator
 (Bessa et al., *e-means: outperforming k-means (in one-tenth the epochs)*,

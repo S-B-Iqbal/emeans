@@ -1,7 +1,7 @@
 project(
   'emeans',
   'c',
-  version: '0.1.0.dev0',
+  version: '0.1.0',
   license: 'BSD-3-Clause',
   meson_version: '>=1.2.0',
 )
