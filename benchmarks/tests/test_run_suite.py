@@ -60,11 +60,13 @@ def test_per_budget_sweep_adds_one_row_per_epoch(tmp_path):
 def test_modes_and_sweeps_are_consistent():
     assert set(run_suite.MODES) == {"quick", "suite", "large"}
     assert set(run_suite.SWEEP_BATCH_SIZES) == set(run_suite.MODES)
-    for _configs, seeds, stem, per_budget in run_suite.MODES.values():
-        assert seeds and isinstance(stem, str) and isinstance(per_budget, bool)
-    assert (
-        run_suite.MODES["large"][3] is True
-    )  # the in-range run compares at equal epochs
+    for _configs, seeds, stem, per_budget, revival in run_suite.MODES.values():
+        assert seeds and isinstance(stem, str)
+        assert isinstance(per_budget, bool) and isinstance(revival, bool)
+    # the in-range run compares at equal epochs and includes the revival ablation
+    assert run_suite.MODES["large"][3] is True
+    assert run_suite.MODES["large"][4] is True
+    assert "n_revivals" in run_suite.FIELDS
 
 
 @pytest.mark.parametrize("mode", ["quick", "suite", "large"])

@@ -16,6 +16,8 @@ arXiv:2611.09501v1).
 - `EMeans` estimator: EMA centroids (Eq. 4), cosine-annealed step (Eq. 5), fitted batch
   size and peak step (Eq. 6-7, Table 2), dead-cluster revival by donor splitting
   (App. H.1), and three finalization strategies (Sec. 3.2).
+- `n_revivals_`: number of clusters revived during `fit` / across `partial_fit` calls, which makes
+  the revival ablation a one-parameter experiment (`revival_period` beyond the step count).
 - Public API: `fit`, `partial_fit`, `predict`, `transform`, `score`, `fit_predict`,
   `fit_transform`, `get_feature_names_out`; dense and CSR input; `sample_weight`.
 - Compiled assignment and reduction kernels (Cython + optional OpenMP) with a NumPy

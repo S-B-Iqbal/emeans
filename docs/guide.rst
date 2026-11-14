@@ -52,8 +52,8 @@ Fitted attributes
 -----------------
 
 ``cluster_centers_``, ``labels_``, ``inertia_``, plus ``n_iter_`` (epochs completed),
-``n_steps_`` (EMA updates performed), ``batch_size_`` and ``alpha0_`` (the resolved
-hyper-parameters).  ``n_steps_`` has the same meaning as in
+``n_steps_`` (EMA updates performed), ``n_revivals_`` (clusters revived), ``batch_size_`` and
+``alpha0_`` (the resolved hyper-parameters).  ``n_steps_`` has the same meaning as in
 :class:`~sklearn.cluster.MiniBatchKMeans`: minibatches processed.
 
 Dead clusters, revival and finalization
