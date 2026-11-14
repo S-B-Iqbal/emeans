@@ -46,8 +46,8 @@
 ## Phase 5 — Packaging & GitHub
 - [x] P5.1 README (citation, BibTeX, not-affiliated note), LICENSE (BSD-3), CITATION.cff, CHANGELOG
 - [x] P5.2 Sphinx + numpydoc + sphinx-gallery example; docs build
-- [ ] P5.3 GitHub Actions: tests matrix, wheels (cibuildwheel), docs, nightly-sklearn
-- [ ] P5.4 Exact gh/git commands printed — NOT executed
+- [x] P5.3 GitHub Actions: tests matrix, wheels (cibuildwheel), docs, nightly-sklearn
+- [x] P5.4 Exact gh/git commands printed — NOT executed
 
 ## Phase 6 — Upstream drafts (saved in docs/upstream/, never posted)
 - [ ] P6.1 scikit-learn-contrib inclusion request

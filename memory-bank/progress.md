@@ -7,11 +7,12 @@
 | 1 NumPy reference | done | approved phase 1 (user, Act mode) |
 | 2 Compliance | done | approved phase 2 (user, Act mode) |
 | 3 Cython/OpenMP | done | approved phase 3 (user) |
-| 4 Benchmarks | done, gate pending | — |
-| 5 Packaging | not started | — |
+| 4 Benchmarks | done | approved phase 4 (user) |
+| 5 Packaging | done, gate pending | — |
 | 6 Upstream drafts | not started | — |
 
 ## What works
+- P5.1-P5.4: distribution renamed to **emeans-cluster** (D-052, import stays `emeans`), CHANGELOG + README with the benchmark table, Sphinx/numpydoc/sphinx-gallery docs (`sphinx -W -n` green), CI matrix 3 OS x Python 3.10-3.13 + docs + coverage + nightly scikit-learn + cibuildwheel artefacts, and `docs/release-runbook.md` (printed only). Two CI defects fixed: gallery sources were gitignored, and MSVC OpenMP linked a missing vcomp DLL (D-056: Windows builds serial now).
 - P4.1-P4.4: `benchmarks/` suite (datasets, harness, runner, plots, report). EMeans reaches the Lloyd@25 test MSE in **2-4 epochs** on the blob datasets (-3.2% at d=32, -19.8% at d=96, median of 5 seeds) but **loses to a validation-swept MiniBatchKMeans on 3 of 4 datasets and to Lloyd on wall-clock (~2x slower serial); the high-n/k and low-d configurations are documented losses. Raw CSV + 3 PNGs + `report.md` committed.
 - P3.1-P3.6: compiled kernels live. `_assign.pyx` (chunked OpenMP assignment, dense + CSR) and `_reduce.pyx` (thread-local weighted reduction) verify bit-exactly against the NumPy oracle; `_backend.py` dispatches to Cython by default (D-051), BLAS limited to one thread (closes D-038). OpenMP is optional (D-044): local builds are serial, CI reports `True 4`. Micro-benchmark (n=20000, k=64, d=32, 1 epoch, 40 updates): NumPy 0.050 s vs Cython 0.015 s -> **3.3x serial**, identical inertia. 269 tests, 4 xfailed.
 - P2.1-P2.4: `parametrize_with_checks` green for explicit and auto configs (223 passed / 4 justified xfails, D-041); dense == CSR equivalence; sample_weight exactness in the alpha0 = 1 regime plus a statistical repeated-rows test; validation and warning surface pinned. Two real bugs fixed (D-042, D-043). 248 passed, 4 xfailed, 99% coverage.
