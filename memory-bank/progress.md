@@ -9,7 +9,8 @@
 | 3 Cython/OpenMP | done | approved phase 3 (user) |
 | 4 Benchmarks | done | approved phase 4 (user) |
 | 5 Packaging | done | approved phase 5 (user, option A `emeans-cluster`) |
-| 6 Upstream drafts | done, gate pending | — |
+| 6 Upstream drafts | done | approved phase 6 (user, option B; merged `d7786c8`) |
+| 7 (proposed) | not started | awaiting approval — see `activeContext.md` |
 
 ## What works
 - Wheels verified on all three operating systems (`wheels.yml`, 2026-11-14): `cibuildwheel` jobs
