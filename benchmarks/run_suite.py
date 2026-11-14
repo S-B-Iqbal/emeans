@@ -23,7 +23,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from datasets import held_out_split, make_blobs, make_high_n_over_k, make_low_dimension
+from datasets import (
+    held_out_split,
+    make_anisotropic,
+    make_blobs,
+    make_high_n_over_k,
+    make_low_dimension,
+)
 from harness import emeans_at, lloyd_at_25, minibatch_sweep, mse, relative_mse
 
 RESULTS = Path(__file__).resolve().parent / "results"
@@ -46,6 +52,13 @@ QUICK = [
 LARGE = [
     ("blobs-96d-n100k-k512", lambda: make_blobs(120_000, 96, 512, seed=1), 512, 5),
     ("blobs-32d-n100k-k512", lambda: make_blobs(120_000, 32, 512, seed=1), 512, 5),
+    # Stress case (P8.6): elongated clusters, Zipf-like sizes, so many clusters starve.
+    (
+        "aniso-96d-n100k-k512",
+        lambda: make_anisotropic(120_000, 96, 512, seed=2),
+        512,
+        5,
+    ),
 ]
 
 # MiniBatchKMeans sweeps: the batch sizes must scale with n for the comparison to be
@@ -57,9 +70,9 @@ SWEEP_BATCH_SIZES = {
 }
 
 MODES = {
-    "quick": (QUICK, [0], "quick", False),
-    "suite": (CONFIGS, list(range(5)), "suite", False),
-    "large": (LARGE, list(range(5)), "large", True),
+    "quick": (QUICK, [0], "quick", False, False),
+    "suite": (CONFIGS, list(range(5)), "suite", False, False),
+    "large": (LARGE, list(range(5)), "large", True, True),
 }
 
 
@@ -75,6 +88,7 @@ FIELDS = [
     "test_mse",
     "rel_test_mse",
     "seconds",
+    "n_revivals",
 ]
 
 
@@ -84,13 +98,15 @@ def run(
     out_path,
     batch_sizes=(256, 1024, 4096),
     minibatch_per_budget=False,
+    revival_ablation=False,
 ):
     """Run every configuration and seed, and return the list of CSV rows.
 
     ``minibatch_per_budget`` sweeps MiniBatchKMeans once per epoch budget instead of
     once at ``max_epochs``, so its rows can be compared with EMeans at equal epochs
     (P7.1).  It multiplies the sweep cost by ``max_epochs``, so the original
-    ``suite`` numbers are left untouched.
+    ``suite`` numbers are left untouched.  ``revival_ablation`` adds a duplicate
+    ``emeans(revival_off)`` run per epoch budget (P8.2b).
     """
     rows = []
     for name, factory, n_clusters, max_epochs in configs:
@@ -115,28 +131,38 @@ def run(
                     "test_mse": ref_test,
                     "rel_test_mse": 0.0,
                     "seconds": reference_seconds,
+                    "n_revivals": 0,
                 }
             )
 
+            variants = [("emeans", {})]
+            if revival_ablation:
+                # A `revival_period` beyond the step count switches revival off
+                # (App. H.1); this measures what the mechanism contributes at scale.
+                variants.append(("emeans(revival_off)", {"revival_period": 10**9}))
             for epochs in range(1, max_epochs + 1):
-                centres, seconds, _ = emeans_at(X_train, n_clusters, epochs, seed)
-                val = mse(X_val, centres)
-                test = mse(X_test, centres)
-                rows.append(
-                    {
-                        "dataset": name,
-                        "n_train": X_train.shape[0],
-                        "n_clusters": n_clusters,
-                        "n_features": X_train.shape[1],
-                        "seed": seed,
-                        "method": "emeans",
-                        "epochs": epochs,
-                        "val_mse": val,
-                        "test_mse": test,
-                        "rel_test_mse": relative_mse(test, ref_test),
-                        "seconds": seconds,
-                    }
-                )
+                for label, extra in variants:
+                    centres, seconds, model = emeans_at(
+                        X_train, n_clusters, epochs, seed, **extra
+                    )
+                    val = mse(X_val, centres)
+                    test = mse(X_test, centres)
+                    rows.append(
+                        {
+                            "dataset": name,
+                            "n_train": X_train.shape[0],
+                            "n_clusters": n_clusters,
+                            "n_features": X_train.shape[1],
+                            "seed": seed,
+                            "method": label,
+                            "epochs": epochs,
+                            "val_mse": val,
+                            "test_mse": test,
+                            "rel_test_mse": relative_mse(test, ref_test),
+                            "seconds": seconds,
+                            "n_revivals": model.n_revivals_,
+                        }
+                    )
 
             budgets = range(1, max_epochs + 1) if minibatch_per_budget else [max_epochs]
             for budget in budgets:
@@ -164,6 +190,7 @@ def run(
                         "test_mse": test,
                         "rel_test_mse": relative_mse(test, ref_test),
                         "seconds": seconds,
+                        "n_revivals": 0,
                     }
                 )
     RESULTS.mkdir(parents=True, exist_ok=True)
@@ -204,7 +231,7 @@ def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "suite"
     if mode not in MODES:
         raise SystemExit(f"mode must be one of {sorted(MODES)}, got {mode!r}")
-    configs, seeds, stem, per_budget = MODES[mode]
+    configs, seeds, stem, per_budget, revival = MODES[mode]
     out = RESULTS / f"{stem}.csv"
     rows = run(
         configs,
@@ -212,6 +239,7 @@ def main():
         out,
         batch_sizes=SWEEP_BATCH_SIZES[mode],
         minibatch_per_budget=per_budget,
+        revival_ablation=revival,
     )
     summarise(rows)
     print(f"wrote {out} ({len(rows)} rows)")

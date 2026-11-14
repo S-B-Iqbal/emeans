@@ -2,8 +2,9 @@
 
 Two result sets, same protocol and same machine:
 
-- **In the fitted range** (`large.csv`, P7.1): `n_train = 100 000`, `k = 512`, `d = 32/96`.  This
-  is the regime the paper's scaling laws were fitted on (`1e5 <= n <= 1e8`, `n/k >= 8`), so the
+- **In the fitted range** (`large.csv`, P7.1/P8.2b): three data sets at `n_train = 100 000`,
+  `k = 512`, `d = 32/96` — two sets of isotropic blobs and one elongated-and-skewed stress case.
+  This is the regime the paper's scaling laws were fitted on (`1e5 <= n <= 1e8`, `n/k >= 8`), so the
   automatic batch size and step are being used as intended (`B = 8 192`, `alpha0 = 0.733`).
 - **Below the fitted range** (`suite.csv`, P4.1-P4.4): four datasets at `n_train = 10 000`
   (`B = 1 024`, `alpha0 = 0.318`).  Kept for continuity; its numbers are extrapolations.
@@ -30,6 +31,8 @@ figures: `benchmarks/plots/*.png`; code: `benchmarks/{datasets,harness,run_suite
   P7.1 run (`large`) the MiniBatchKMeans sweep is repeated at **every** epoch budget 1..5 with
   batch sizes {1024, 8192, 65536}, so the two methods can be compared at equal epochs; `suite.csv`
   keeps the original single sweep at 5 epochs.
+- The `large` run additionally repeats EMeans with revival switched off
+  (`revival_period = 10**9`, P8.2b) at every epoch budget, and every row records `n_revivals`.
 
 ## Environment
 
@@ -73,29 +76,71 @@ by 5/5 seeds.  The sweep picked `batch_size = 1024, reassignment_ratio = 0.01` e
 Lloyd@25 reference: test MSE 5.759 in 2.18 s.  `epochs_to_ref` = median **1** (4/5 seeds at epoch
 1, one seed at 4).  The sweep picked `batch_size = 1024, reassignment_ratio = 0.1` in 4/5 seeds.
 
+### `aniso-96d-n100k-k512` (P8.6 stress case: elongated clusters, Zipf-like sizes)
+
+Same size and dimensions as the `blobs-96d` case, but each cluster is stretched along a random
+direction and the cluster sizes follow a Pareto law, so a handful of clusters hold most points and
+many are nearly empty.
+
+| epochs | EMeans rel (median / worst seed) | revivals | EMeans s | MiniBatch rel (median / worst) | MiniBatch s |
+|---|---|---|---|---|---|
+| 1 | **-9.7 %** / -4.4 % | 281 | 0.61 | -34.5 % / -25.8 % | 2.23 |
+| 2 | **-17.0 %** / -6.0 % | 239 | 0.79 | -45.1 % / -37.8 % | 5.60 |
+| 3 | -14.6 % / -10.8 % | 261 | 1.00 | -50.1 % / -46.2 % | 7.37 |
+| 4 | -9.7 % / -8.6 % | 231 | 1.20 | -52.7 % / -47.5 % | 9.44 |
+| 5 | -13.6 % / -7.7 % | 236 | 1.44 | -55.0 % / -49.8 % | 11.15 |
+
+Lloyd@25 reference: test MSE 110.148 in 2.65 s.  `epochs_to_ref` = median **1**, 5/5 seeds.
+On skewed, elongated data the curve is no longer monotone (it peaks at epoch 2 and drifts), and the
+tuned MiniBatchKMeans is much further ahead than on the isotropic blobs.
+
+### Revival ablation (P8.2b): the mechanism is doing the work
+
+`revival_period` larger than the number of updates switches the dead-cluster revival off
+(App. H.1); everything else is identical.  Median of 5 seeds, test MSE relative to Lloyd@25:
+
+| dataset | EMeans@5 (revival on) | revivals | EMeans@5 (revival off) | seeds reaching Lloyd@25 without revival |
+|---|---|---|---|---|
+| `blobs-96d` | **-33.9 %** | 236 | **+2.2 %** | 1/5 (median 4 among those) |
+| `blobs-32d` | **-15.5 %** | 112 | **+1.8 %** | 2/5 (median 3) |
+| `aniso-96d` | **-13.6 %** | 236 | **+0.8 %** | 2/5 (median 3.5) |
+
+Read plainly: **without revival, e-means does not beat Lloyd@25 at all** - it lands within about
+2 % of it after five epochs and usually never reaches it.  With revival it ends 13.6-33.9 % below,
+and the counter shows 90-280 clusters revived per fit (out of 512).  This is the strongest
+mechanistic result in the report, and it is the one that argues for split-based revival in
+`MiniBatchKMeans` (P6.3).
+
 ### What this says
 
 **Reproduced at this scale**
 
-- e-means reaches the Lloyd@25 test MSE in **one epoch** in 9 of 10 runs (paper: 1.4-2.6 epochs in
+- e-means reaches the Lloyd@25 test MSE in **one epoch** in 14 of 15 runs (paper: 1.4-2.6 epochs in
   Table 4, 1.0-3.0 at `n/k = 1000` in Table 10).  The same code needed 2-4 epochs at
   `n_train = 10 000`, i.e. the automatic batch size and step behave as the laws intend.
 - Dimension helps: after 5 epochs `d = 96` is **-33.9 %** below Lloyd@25 against **-15.5 %** at
   `d = 32`, consistent with App. D.2.
-- e-means is now **faster than the reference too**: 0.66 s at 1 epoch and 1.49 s at 5 epochs
-  against 2.26 s for Lloyd@25 at `d = 96`.  At `n_train = 10 000` we measured the opposite
+- e-means is now **faster than the reference too**: 0.63 s at 1 epoch and 1.50 s at 5 epochs
+  against 2.02 s for Lloyd@25 at `d = 96`.  At `n_train = 10 000` we measured the opposite
   (~2x slower), so the small-scale timing result did not generalise - this one may not either.
+- **Revival carries the result**: switching it off (`revival_period` beyond the step count) leaves
+  e-means within ~2 % of Lloyd@25 instead of 13.6-33.9 % below it, and most seeds never reach the
+  reference at all.  The paper credits the mechanism (App. H.2); we can now show it.
 
 **Still losing (including to a tuned baseline)**
 
-1. **At equal epochs the validation-tuned MiniBatchKMeans is ahead in both datasets**
-   (-36.1 % vs -19.0 % at 1 epoch and -47.3 % vs -33.9 % at 5 epochs at `d = 96`).  It is tuned
-   per validation split; EMeans is never tuned.
-2. **At equal time** the comparison splits by dimension: at `d = 96`, EMeans@5 gives -33.9 % in
-   1.49 s where MiniBatch@1 gives -36.1 % in 3.96 s (nearly the same quality for 2.7x less time);
-   at `d = 32`, MiniBatch@1 wins outright (-29.4 % in 1.67 s against our -8.3 % in 0.49 s).
-3. Both datasets are synthetic Gaussian blobs with 512 clusters.  Real embeddings are not
-   guaranteed to behave this way, and neither is a dataset with drift or very unbalanced clusters.
+1. **At equal epochs the validation-tuned MiniBatchKMeans is ahead in all three datasets**
+   (-47.3 %, -41.1 % and -55.0 % at 5 epochs against our -33.9 %, -15.5 % and -13.6 %).  It is
+   tuned per validation split; EMeans is never tuned.
+2. **At equal time** the comparison splits by dimension: at `d = 96` (isotropic), EMeans@5 gives
+   -33.9 % in 1.50 s where MiniBatch@1 gives -36.1 % in 3.33 s (nearly the same quality for about
+   twice less time); at `d = 32` and on the anisotropic case MiniBatch wins outright at every
+   budget we measured.
+3. The datasets are synthetic: isotropic Gaussian blobs, plus one elongated-and-skewed stress case.
+   Real embeddings are not guaranteed to behave this way, and a data set with drift, duplicates or
+   very many tiny clusters is untested.
+4. Run-to-run wall-clock varies by roughly 10 % between suites (the `blobs-96d` Lloyd@25 reference
+   was 2.26 s in the P7.1 run and 2.02 s here); treat seconds as indicative, not precise.
 
 ## Results below the fitted range (`n_train = 10 000`, median of 5 seeds)
 
