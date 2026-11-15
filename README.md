@@ -104,7 +104,12 @@ was ~2x slower than Lloyd@25 - the small-scale result did not generalise to `n =
 
 Full protocol, all configurations and the deviations from the paper are in
 [`benchmarks/report.md`](benchmarks/report.md); raw data in `benchmarks/results/{large,suite}.csv`;
-figures in `benchmarks/plots/<stem>/`.
+figures in `benchmarks/plots/<stem>/`.  The same suite also runs with **OpenMP** on a Linux CI
+runner (`results/large-omp.csv`): the test MSE matches the serial run to within 4e-14 on all 240
+rows, and the EMeans loop is 1.5-1.8x faster there.  A head-to-head against the independently
+released `sklearn-contrib-emeans` 0.3.2 (single thread for both) is in `results/head2head.csv`:
+both implementations resolve the same automatic batch size and agree within 2.6 points of relative
+MSE, with neither dominating.
 
 ## Not affiliated
 

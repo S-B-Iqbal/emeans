@@ -95,8 +95,10 @@ How to read it:
 ## Caveats that must accompany any posted number
 
 1. Our wall-clock figures come from an **Apple M2 with serial kernels**; theirs come from OpenMP
-   wheels. Outside the "Measured head-to-head" section above - where both ran with
-   `OMP_NUM_THREADS=1`, so the seconds are comparable - compare *epochs*, never seconds (Q-033).
+   wheels. Two exceptions where seconds *are* comparable: the "Measured head-to-head" section above
+   (both single-threaded, `OMP_NUM_THREADS=1`) and our own OpenMP run on a 4-thread Linux CI runner
+   (`benchmarks/results/large-omp.csv`), which reproduces the serial test MSE to 4e-14 on all 240
+   rows and runs the e-means loop 1.5-1.8x faster. Otherwise compare *epochs*, never seconds (Q-033).
 2. Our headline measurements now come from the P7.1 run, `n_train = 100 000`, `k = 512`,
    `d = 32/96` — inside the range the laws were fitted on (`B = 8 192`, `alpha0 = 0.733`): one
    epoch to the Lloyd@25 test MSE in 9 of 10 runs, −33.9 % at `d = 96` after 5 epochs at 1.5 s

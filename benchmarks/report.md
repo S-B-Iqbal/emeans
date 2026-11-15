@@ -160,6 +160,33 @@ ours is ahead on two of three data sets, theirs on the deepest one and on wall-c
 faster at this size).  Raw data: `benchmarks/results/head2head.csv`; reproduce with
 `OMP_NUM_THREADS=1 python benchmarks/head2head.py` (requires `sklearn-contrib-emeans==0.3.2`).
 
+### The same suite with OpenMP on a Linux runner (P9.2)
+
+`benchmarks/results/large-omp.csv` is the identical suite run on a GitHub
+`ubuntu-latest` runner, where the compiled kernels use OpenMP (`has_openmp() == True`,
+4 threads, `OMP_NUM_THREADS` unset).  Reproduce with the manual `benchmark` workflow
+(`gh workflow run benchmark.yml`); the CSV is uploaded as the `large-omp` artefact.
+
+| dataset | method | relative to Lloyd@25 (serial / OpenMP) | serial s (M2) | OpenMP s (runner) |
+|---|---|---|---|---|
+| `blobs-96d` | EMeans@5 | -33.9 % / -33.9 % | 1.50 | 0.91 |
+| `blobs-96d` | EMeans@5, no revival | +2.2 % / +2.2 % | 1.46 | 0.89 |
+| `blobs-96d` | Lloyd@25 | 0 / 0 | 2.02 | 1.76 |
+| `blobs-32d` | EMeans@5 | -15.5 % / -15.5 % | 1.03 | 0.58 |
+| `aniso-96d` | EMeans@5 | -13.6 % / -13.6 % | 1.44 | 0.94 |
+
+Two things to take from it:
+
+- **The two runs agree numerically**: for all 240 rows the test MSE is identical to within
+  floating-point noise (worst absolute difference 4.3e-14).  Running the assignment and the
+  weighted reduction with OpenMP does not change the result at `n = 100 000`, which is the
+  same guarantee the unit tests assert at small scale (`test_backends.py`).
+- **OpenMP speeds the EMeans loop up more than it speeds Lloyd up** on the same machine pair
+  (1.5-1.8x against 1.0-1.2x), which is what an assignment-dominated method should do.
+  These are **not** pure thread-scaling numbers: the serial column is an 8-core Apple M2 and
+  the OpenMP column a 4-core x86 runner, so CPU and threading are confounded.  Only the
+  numerical agreement is a controlled comparison.
+
 ## Results below the fitted range (`n_train = 10 000`, median of 5 seeds)
 
 | dataset | k | d | epochs to Lloyd@25 | EMeans@5 test MSE vs Lloyd | worst seed | MiniBatch (swept) | EMeans s | Lloyd@25 s |

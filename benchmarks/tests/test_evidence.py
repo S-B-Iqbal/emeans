@@ -138,3 +138,25 @@ def test_the_tuned_minibatch_baseline_is_reported_as_ahead(rows):
             ]
         )
         assert minibatch < emeans, (dataset, emeans, minibatch)
+
+
+def test_the_openmp_run_reproduces_the_serial_result(rows):
+    """P9.2: the Linux/OpenMP run must agree with the serial run on every row."""
+    other = RESULTS / "large-omp.csv"
+    if not other.exists():
+        pytest.skip("results/large-omp.csv missing; run the `benchmark` workflow")
+    with other.open(newline="") as handle:
+        omp = list(csv.DictReader(handle))
+
+    key = lambda row: (row["dataset"], row["seed"], row["method"], row["epochs"])  # noqa: E731
+    serial_by_key = {key(row): row for row in rows}
+    omp_by_key = {key(row): row for row in omp}
+    shared = sorted(set(serial_by_key) & set(omp_by_key))
+
+    assert len(shared) >= 200
+    worst = max(
+        abs(float(serial_by_key[k]["test_mse"]) - float(omp_by_key[k]["test_mse"]))
+        for k in shared
+    )
+    assert worst < 1e-9, worst
+    assert int(omp_by_key[shared[0]]["n_revivals"]) >= 0  # schema is the same
