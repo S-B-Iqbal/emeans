@@ -8,7 +8,9 @@ confirmation). Requirements below are quoted from `scikit-learn-contrib/workflow
 ## The project
 
 - **Repository:** <https://github.com/S-B-Iqbal/emeans> (public, BSD-3-Clause).
-- **PyPI:** `emeans-cluster` (import name `emeans`) — *not yet released*; the name `emeans` on
+- **PyPI:** `emeans-cluster` **0.1.0, published 2026-11-15** (import name `emeans`, 13 files:
+wheels for CPython 3.10-3.13 on Linux x86_64, macOS arm64 and Windows amd64, plus the sdist); the
+name `emeans` on
   PyPI belongs to an unrelated Rust implementation, hence the distribution suffix (D-052).
 - **What it is:** an independent, scikit-learn compatible implementation of e-means
   (Bessa et al., [arXiv:2611.09501](https://arxiv.org/abs/2611.09501)) written from the paper, with
@@ -29,8 +31,10 @@ confirmation). Requirements below are quoted from `scikit-learn-contrib/workflow
 | PEP8 compliant | **met** | ruff-check + ruff-format (line length 88), clean in `pre-commit` and CI |
 | Continuous integration | **met** | GitHub Actions: 3 OS × Python 3.10–3.13, docs job, coverage job, weekly nightly-scikit-learn job, cibuildwheel wheels built as artefacts |
 
-Known gaps, stated up front: no PyPI release yet, no `gh-pages` documentation, no user guide, and
-Windows/macOS wheels are serial because their toolchains have no OpenMP (D-044, D-056).
+Known gaps, stated up front: no `gh-pages` documentation (the HTML is built in CI but not
+published), no narrative user guide beyond `docs/guide.rst`, and Windows/macOS wheels are serial
+because their toolchains have no OpenMP (D-044, D-056).  The PyPI release (`emeans-cluster` 0.1.0,
+2026-11-15) and the repository are in place.
 
 ## The duplicate-algorithm question (needs the org's answer)
 
@@ -77,9 +81,10 @@ Happy to fold sample_weight / partial_fit into the existing project instead if t
 preferred outcome.
 ```
 
-## Verification before filing (not yet done)
+## Verification before filing (partly done)
 
-- [ ] `pip install emeans-cluster` works from a published release (no release exists yet).
+- [x] `pip install emeans-cluster` works from the published release: 0.1.0 on PyPI since
+  2026-11-15 (13 files, verified in a clean virtual environment).
+- [x] User guide page written (`docs/guide.rst`) and added to the toctree.
 - [ ] Sphinx HTML published to `gh-pages` for review.
-- [ ] User guide page written (`docs/guide.rst`) and added to the toctree.
 - [ ] User's explicit go-ahead to file the issue (rule 01).

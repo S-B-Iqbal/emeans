@@ -16,11 +16,12 @@ The PyPI distribution is called **`emeans-cluster`** because `emeans` is an unre
 implementation of the same paper; the **import name is `emeans`**.
 
 ```bash
-pip install emeans-cluster          # once released
+pip install emeans-cluster        # 0.1.0, published 2026-11-15
 ```
 
-Until then, from a source checkout (needs `meson-python`, `meson`, `ninja`, `cython`,
-`numpy`, `scipy` installed first):
+Wheels are on PyPI for CPython 3.10-3.13 on Linux (x86_64), macOS (arm64) and Windows (amd64);
+anything else builds from the sdist.  From a source checkout instead (needs `meson-python`,
+`meson`, `ninja`, `cython`, `numpy`, `scipy` installed first):
 
 ```bash
 pip install -e . --no-build-isolation

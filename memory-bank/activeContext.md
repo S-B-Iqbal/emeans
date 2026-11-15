@@ -3,7 +3,7 @@
 **Phase:** 9 - evidence guard, head-to-head, OpenMP numbers, example - **Mode:** ACT (approved, merged `dc99691`)
 **Status:** Phase 9 **closed** (issue #10 closed).  No phase is running: the next one needs explicit
 approval (proposal below).
-`v0.1.0` is published as a **GitHub release** (D-060); the PyPI upload is blocked on credentials.
+`emeans-cluster` **0.1.0 is on PyPI** (2026-11-15, D-063) and the GitHub release `v0.1.0` carries the same files.  The burner token used for the upload must be revoked.
 The #35383 comment **is posted** (D-061).
 
 ## Phase 9 results

@@ -16,6 +16,8 @@
 | 10 (proposed) | not started | awaiting approval - see `activeContext.md` |
 
 ## What works
+- **Published**: `emeans-cluster` 0.1.0 is on PyPI since 2026-11-15 (D-063): sdist + 12 wheels (CPython 3.10-3.13 on Linux/macOS/Windows), all rebuilt from the `v0.1.0` tag and `twine check`ed, verified by installing from PyPI in a clean venv.  The GitHub release `v0.1.0` carries the same files.
+
 - P7.0-P7.3: the benchmark now runs **inside the fitted range** (`benchmarks/run_suite.py large`,
   `n_train = 100 000`, `k = 512`, `d = 32/96`, `B = 8 192`, `alpha0 = 0.733`) with the
   MiniBatchKMeans sweep repeated at every epoch budget so both methods are compared at equal

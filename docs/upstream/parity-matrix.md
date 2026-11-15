@@ -46,7 +46,7 @@ Sources
 | Array API / GPU | out of scope for this project (App. J/M) | not supported | PyTorch/CuPy via `array_api_dispatch=True` | GPU through Faiss |
 | Minimum scikit-learn | — | 1.6 (`validate_data`, `__sklearn_tags__`) | 1.7 | n/a |
 | Compliance | — | `parametrize_with_checks` green, 4 justified xfails (D-041); 269 tests; coverage gate 90 % | runs the scikit-learn estimator checks (per project description) | n/a |
-| Distribution | — | `emeans-cluster` on PyPI (import `emeans`, D-052); **no wheels published yet** | `sklearn-contrib-emeans` with wheels on PyPI since 13 Nov 2026 | inside Faiss |
+| Distribution | — | `emeans-cluster` **0.1.0 on PyPI since 2026-11-15** (import `emeans`, D-052): wheels for CPython 3.10-3.13 on Linux x86_64, macOS arm64 and Windows amd64, plus an sdist | `sklearn-contrib-emeans` with wheels on PyPI since 13 Nov 2026 | inside Faiss |
 | Licence | — | BSD-3-Clause, independent implementation, no Faiss code | not checked here | MIT |
 
 ## What each project has that the other does not
