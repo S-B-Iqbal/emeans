@@ -142,6 +142,24 @@ mechanistic result in the report, and it is the one that argues for split-based 
 4. Run-to-run wall-clock varies by roughly 10 % between suites (the `blobs-96d` Lloyd@25 reference
    was 2.26 s in the P7.1 run and 2.02 s here); treat seconds as indicative, not precise.
 
+### Head-to-head against another implementation (P9.1, 2026-11-15)
+
+`benchmarks/head2head.py` runs this package against the independently released
+`sklearn-contrib-emeans` **0.3.2** on the same three data sets, with the same epoch budget
+(5), the same initialisation, the same seeds and **one thread each** (`OMP_NUM_THREADS=1`):
+
+| dataset | `emeans-cluster` (ours) | `sklearn-contrib-emeans` 0.3.2 | batch size (both) |
+|---|---|---|---|
+| `blobs-96d` | -33.9 % in 0.84 s | **-36.5 %** in 0.74 s | 8 192 |
+| `blobs-32d` | **-15.5 %** in 0.60 s | -14.7 % in 0.56 s | 8 192 |
+| `aniso-96d` | **-13.6 %** in 0.84 s | -10.1 % in 0.73 s | 8 192 |
+
+Two independent implementations agree on the automatic batch size and land within 2.6 points of
+relative MSE of each other: a reproducibility check on the method itself.  Neither dominates -
+ours is ahead on two of three data sets, theirs on the deepest one and on wall-clock (~10-15 %
+faster at this size).  Raw data: `benchmarks/results/head2head.csv`; reproduce with
+`OMP_NUM_THREADS=1 python benchmarks/head2head.py` (requires `sklearn-contrib-emeans==0.3.2`).
+
 ## Results below the fitted range (`n_train = 10 000`, median of 5 seeds)
 
 | dataset | k | d | epochs to Lloyd@25 | EMeans@5 test MSE vs Lloyd | worst seed | MiniBatch (swept) | EMeans s | Lloyd@25 s |

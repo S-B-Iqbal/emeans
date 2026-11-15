@@ -68,10 +68,35 @@ Sources
 - Fractional `n_epochs` (the paper's 0.2-epoch protocol), `k-means||` init, callable init.
 - Array API support (PyTorch/CuPy) and a longer history toward contrib inclusion.
 
+## Measured head-to-head (P9.1, 2026-11-15)
+
+Both implementations were run on the same data, same epoch budget (`n_epochs = 5`), same
+`init="random"`, same seeds and **one thread each** (`OMP_NUM_THREADS=1`).  `n_train = 100 000`,
+`k = 512`; median of 5 seeds; test MSE relative to `KMeans(init="random", max_iter=25, tol=0)`.
+Reproduce with `OMP_NUM_THREADS=1 python benchmarks/head2head.py` (writes
+`benchmarks/results/head2head.csv`); `sklearn-contrib-emeans` pinned at 0.3.2.
+
+| dataset | `emeans-cluster` (ours) | `sklearn-contrib-emeans` 0.3.2 | batch size (both) |
+|---|---|---|---|
+| `blobs-96d-n100k-k512` | -33.9 % in 0.84 s | **-36.5 %** in 0.74 s | 8 192 |
+| `blobs-32d-n100k-k512` | **-15.5 %** in 0.60 s | -14.7 % in 0.56 s | 8 192 |
+| `aniso-96d-n100k-k512` | **-13.6 %** in 0.84 s | -10.1 % in 0.73 s | 8 192 |
+
+How to read it:
+
+- The two independent implementations **agree closely** on the automatic batch size (both resolve
+  `B = 8 192`) and land within 2.6 points of relative MSE of each other, which is a useful
+  reproducibility check on the paper's method by itself.
+- Neither dominates: ours is better on two of three data sets, theirs on the deepest one; theirs is
+  consistently 10-15 % faster in wall-clock at this size (single thread for both).
+- This is **not** a benchmark of the two packages in general: it covers one metric (test MSE vs
+  Lloyd@25), one budget (5 epochs), one machine, and single-threaded runs only.
+
 ## Caveats that must accompany any posted number
 
 1. Our wall-clock figures come from an **Apple M2 with serial kernels**; theirs come from OpenMP
-   wheels. The two are not comparable (Q-033): compare *epochs*, never seconds.
+   wheels. Outside the "Measured head-to-head" section above - where both ran with
+   `OMP_NUM_THREADS=1`, so the seconds are comparable - compare *epochs*, never seconds (Q-033).
 2. Our headline measurements now come from the P7.1 run, `n_train = 100 000`, `k = 512`,
    `d = 32/96` — inside the range the laws were fitted on (`B = 8 192`, `alpha0 = 0.733`): one
    epoch to the Lloyd@25 test MSE in 9 of 10 runs, −33.9 % at `d = 96` after 5 epochs at 1.5 s
