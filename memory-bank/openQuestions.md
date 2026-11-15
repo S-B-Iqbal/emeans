@@ -45,6 +45,10 @@ their Q id there).
 | Q-027 | D-035 | slow-EMA split geometry (children from the slow donor centroid) |
 | Q-028 | D-036 | first `partial_fit` batch needs `n >= k` |
 | Q-029 | D-052 | PyPI name `emeans` taken → distribution `emeans-cluster` |
+| Q-030 | OPEN | fractional `n_epochs` (parked; would need a schedule-contract change) |
+| Q-031 | OPEN | package naming (`emeans-cluster` kept; no collision with `sklearn_emeans`) |
+| Q-032 | D-061 | offer `sample_weight` + `partial_fit` upstream — answered "mention-only" and posted |
+| Q-033 | partly | thread-matched head-to-head at `OMP_NUM_THREADS=1` (D-062); serial-vs-OpenMP wheel caveat stays for general claims |
 
 New ambiguities are appended here as `Q-NNN` with status `OPEN` via `/open-question.md`, and
 move to the decision log only after user approval.
