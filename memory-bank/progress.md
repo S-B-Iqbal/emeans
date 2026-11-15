@@ -11,7 +11,8 @@
 | 5 Packaging | done | approved phase 5 (user, option A `emeans-cluster`) |
 | 6 Upstream drafts | done | approved phase 6 (user, option B; merged `d7786c8`) |
 | 7 Scale-up, release prep, guide | done | approved phase 7 (user; merged `f7dd3dd`) |
-| 8 Evidence hardening | in progress | approved phase 8 (user) |
+| 8 Evidence hardening | done | approved phase 8 (user; merged `af69786`) |
+| 9 (proposed) | not started | awaiting approval — see `activeContext.md` |
 
 ## What works
 - P7.0-P7.3: the benchmark now runs **inside the fitted range** (`benchmarks/run_suite.py large`,

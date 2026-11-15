@@ -1,98 +1,56 @@
 # Active context
 
+**Phase:** 8 - evidence hardening - **Mode:** ACT (approved, merged `af69786`)
+**Status:** Phases 0-8 are **closed and merged to `main`**. No phase is running: the next one needs
+explicit approval (proposal below). Nothing has been posted upstream, tagged, uploaded or released.
 
-**Phase:** 8 - evidence hardening - **Mode:** ACT (approved by the user: P8.1, P8.2a, P8.2b, P8.6)
-**Status:** P8.1/P8.2a/P8.2b/P8.6 done on `phase-8-evidence`; gate pending.
-P8.3 (execute the release), P8.4 (Q-030), P8.5 (Q-033) remain parked.
-
-## Phase 8 results
-- **P8.1** every upstream draft now quotes the in-range numbers; the comment is 348 words and points
-  at `github.com/S-B-Iqbal/emeans` instead of a non-existent `pip install`.
-- **P8.2a** `benchmarks/tests/test_run_suite.py` (7 smoke tests) + a CI step; the runner can no longer
-  break silently.  `testpaths` now collects `emeans` and `benchmarks/tests`.
-- **P8.2b** `EMeans.n_revivals_` (public fitted attribute, documented in the docstring, guide and
-  CHANGELOG), recorded in the CSV, with a revival ablation in the `large` run.  **Result: without
-  revival e-means does not beat Lloyd@25 at all** (-33.9 % -> +2.2 % at `d = 96`, -15.5 % -> +1.8 %
-  at `d = 32`, -13.6 % -> +0.8 % on the stress case); 90-280 of 512 clusters are revived per fit.
-- **P8.6** `make_anisotropic` (elongated clusters, Pareto sizes) added to
-  `blobs-96d/32d + aniso-96d`: e-means -13.6 % (non-monotone curve, peaks at epoch 2) against a
-  tuned MiniBatchKMeans at -55.0 %; the stress case is reported as a clear loss at equal budgets.
-- Traps recorded: new files under `emeans/` must be listed in the matching `meson.build`
-  `py.install_sources` (see `techContext.md`); `benchmarks/tests` needs an explicit CI step.
-
-## Outstanding decisions (asked, not answered)
-- **Q-032** (offer `sample_weight` + `partial_fit` upstream) - needed before the #35383 comment is final.
-- Release go-ahead for `git tag -a v0.1.0`, `twine upload -r pypi dist/*`, `gh release create`
-  (all three still unexecuted), and enabling GitHub Pages for `docs-publish.yml`.
-- **Q-030** fractional `n_epochs` (P8.4/P7.4), **Q-033** macOS OpenMP wheels (P8.5/P7.5).
-- Posting any `docs/upstream/` draft still needs a separate explicit go-ahead (rule 01).
-
-## Phase 7 results
-- **P7.0/P7.3** `docs/guide.rst` (new user guide, in the toctree), `docs-publish.yml` (manual
-  trigger: enabling Pages is a settings change and stays gated), and the false install claim in
-  `docs/upstream/sklearn-35383-comment.md` is fixed.
-- **P7.1** `benchmarks/run_suite.py large`: `n_train = 100 000`, `k = 512`, `d = 32/96`,
-  `B = 8 192`, `alpha0 = 0.733`, MiniBatchKMeans swept at **every** epoch budget.
-  Results (median of 5 seeds, test MSE vs Lloyd@25): epochs-to-reference **1** (9/10 seeds;
-  paper 1.4-2.6), d=96 EMeans@1 -19.0%, @5 **-33.9%** (1.5 s) vs Lloyd@25 2.3 s, tuned
-  MiniBatch@5 **-47.3%** (14 s); d=32 EMeans@5 -15.5% vs MiniBatch@5 -41.1%. Honest verdict in
-  `benchmarks/report.md`: e-means wins on epochs and on time at d=96, loses to the tuned
-  MiniBatchKMeans at equal epochs in both datasets and at equal time at d=32.
-- **P7.2** release prepared: version `0.1.0` in `meson.build` + CHANGELOG dated, `python -m build`
-  produces `emeans_cluster-0.1.0{,.tar.gz}`, `twine check` PASSED, clean-venv install reports
-  `0.1.0` with `has_openmp() == False` locally (macOS).  Gated and NOT executed: `git tag`,
-  `twine upload`, `gh release create`.
-- Traps recorded in `docs/release-runbook.md` and `progress.md`: `meson dist` archives git HEAD
-  (commit the version bump first), and `ruff format` reformats Python inside Markdown.
-
-## Outstanding decisions (asked, not answered)
-- **Q-032**: offer `sample_weight` + `partial_fit` upstream? Needed to freeze the #35383 text.
-- Enabling GitHub Pages (settings change) to make `docs-publish.yml` useful.
-- Release go-ahead for the three gated commands above.
-- **Q-030** fractional `n_epochs` (P7.4), **Q-033** OpenMP macOS wheels (P7.5).
-- Posting any `docs/upstream/` draft still needs a separate explicit go-ahead (rule 01).
-
-## Phase 6 (closed)
-Merged to `main` as `d7786c8`; issue #7 closed; six drafts in `docs/upstream/`, nothing posted.
-Linux wheels build on `manylinux_2_28` (D-059); wheel self-test `openmp: True` on Linux, `False` on
-macOS/Windows.
-
-## Notes for the next session
-- Unit tests must stay fast: pass explicit `batch_size`/`n_epochs` rather than `"auto"`.
-- Repo-local git identity `S-B-Iqbal <28038429+S-B-Iqbal@users.noreply.github.com>` (D-031);
-  pushing `origin` branches is pre-authorised (D-030). Tags, `gh release`, PyPI upload, visibility
-  changes, branch deletion and any write to another repository need explicit confirmation each time.
-- Generated docs output (`docs/generated/`, `docs/sg_execution_times.rst`) is gitignored;
-  `docs/auto_examples/` holds the sources and is tracked.
-2. **Q-032**: offer `sample_weight` + `partial_fit` upstream (changes the last paragraph of the
-   #35383 comment and item 3 of the Discussion).
-3. **Posting order approved**: #35383 comment (P6.2) first, then the embedding example (P6.5) in
-   the same thread; hold the Discussion (P6.3) and the contrib request (P6.1) until a maintainer
-   signals the route or we have a release.
-4. **Q-030** fractional `n_epochs`, **Q-033** OpenMP macOS wheels — decide only if Phase 7 runs.
-
-## Proposed Phase 7 (ranked; not started)
-- **P7.1** benchmark inside the fitted range: `n = 100 000`, `d = 96`, `k = 512`. Our resolver gives
-  `B = 8 192`, `alpha0 = 0.733`, 13 batches/epoch — the regime the paper claims, which retires the
-  "below the fitted range" caveat carried by every draft.
-- **P7.2** release `emeans-cluster` 0.1.0 (runbook exists; tag/twine/`gh release` stay gated).
-- **P7.3** user guide page + `gh-pages` (the two remaining contrib gaps).
-- **P7.4** Q-030 fractional `n_epochs`; **P7.5** Q-033 macOS OpenMP wheels (libomp).
-- Lowest priority: k-means|| init.
+## Proposed Phase 9 (ranked; not started)
+- **P9.1** head-to-head against `sklearn-contrib-emeans` **0.3.2**: isolated venv,
+  `OMP_NUM_THREADS=1` for both, our three in-range data sets with `n_epochs` matched; record test
+  MSE and wall-clock and replace the `n/d` cells in `docs/upstream/parity-matrix.md` with measured
+  values. The one question our own evidence cannot answer.
+- **P9.4** embedding-clustering example in *our* gallery
+  (`docs/auto_examples/plot_emeans_embeddings.py`, from the P6.5 sketch) - the example `betatim`
+  asked for, done where no permission is needed.
+- **P9.2** post the #35383 comment (gated, per draft; needs Q-032 answered).
+- **P9.3** execute the 0.1.0 release and enable Pages (gated, per command).
+- Parked until answered: Q-030 fractional `n_epochs` (P9.5), Q-033 macOS OpenMP wheels (P9.6),
+  k-means|| (P9.7).
 
 ## Upstream state (2026-11-14, re-checked)
-- scikit-learn #35383 OPEN, quiet since 13 Nov; `betatim` asked for an embedding-clustering
-  example, which is exactly our winning regime (d = 96: -19.8% vs Lloyd@25 at 5 epochs).
-- scikit-learn-contrib: **no e-means inclusion request filed yet**; `workflow.md` requires the
-  PyPI name `sklearn-contrib-<project>` (taken) and includes a repo transfer on acceptance.
-- `sklearn-contrib-emeans`: 0.2.0 (12 Nov) and 0.3.1 (13 Nov); OpenMP wheels, CSR, fractional
-  epochs, k-means||, array API; no `sample_weight`, no `partial_fit`.
+- scikit-learn #35383: OPEN, unchanged since 13 Nov; `betatim`'s request for an embedding-clustering
+  example is still unanswered, and `glevv` suggested `MiniBatchKMeans(algorithm="e-means")`.
+- `sklearn-contrib-emeans`: **0.3.2 released 2026-11-14 20:26** (six releases in three days).
+  Has OpenMP wheels, CSR, fractional `n_epochs`, k-means||, array API; no `sample_weight`,
+  no `partial_fit`. Still **no** scikit-learn-contrib inclusion request filed (the slot is open, but
+  inclusion would require a repo transfer and the `sklearn-contrib-*` name, which is taken).
+
+## Phase history (all merged)
+- **P8** `n_revivals_` + revival ablation (without revival: +2.2 %/+1.8 %/+0.8 % vs -33.9 %/-15.5 %/
+  -13.6 % with it), anisotropic stress case, 7 benchmark-runner smoke tests in CI, drafts refreshed
+  with in-range numbers (comment 348 words).
+- **P7** in-range benchmark (`n_train = 100 000`, `B = 8 192`, `alpha0 = 0.733`, one epoch to
+  Lloyd@25 in 14/15 runs), user guide, docs-publish workflow, release prepared (build + `twine
+  check` PASSED + clean-venv install at `0.1.0`).
+- **P6** six upstream drafts in `docs/upstream/`, none posted; Linux wheels on `manylinux_2_28`
+  (D-059).
+- **P0-P5** scaffold (meson-python), NumPy reference, sklearn compliance (4 justified xfails),
+  Cython/OpenMP kernels, honest benchmarks, packaging + docs + CI matrix.
+
+## Outstanding decisions (asked, not answered)
+- **Q-032** offer `sample_weight` + `partial_fit` upstream? Needed before the #35383 comment goes out.
+- Release go-ahead: `git tag -a v0.1.0`, `python -m twine upload -r pypi dist/*`,
+  `gh release create v0.1.0 dist/*`, plus enabling GitHub Pages for `docs-publish.yml`.
+- **Q-030** fractional `n_epochs`, **Q-033** OpenMP macOS wheels; posting any draft (rule 01).
 
 ## Notes for the next session
 - Unit tests must stay fast: pass explicit `batch_size`/`n_epochs` rather than `"auto"`.
+- New files under `emeans/` must be added to the matching `meson.build` `py.install_sources` list,
+  then `pip install -e . --no-build-isolation`; `benchmarks/tests` needs its own explicit pytest
+  invocation (`--pyargs emeans` cannot see it).
 - Repo-local git identity `S-B-Iqbal <28038429+S-B-Iqbal@users.noreply.github.com>` (D-031);
-  pushing `origin` branches is pre-authorised (D-030). Tags, `gh release`, PyPI upload,
-  visibility changes, branch deletion and any write to another repository need explicit
-  confirmation each time — including posting any Phase 6 draft.
+  pushing `origin` branches is pre-authorised (D-030). Tags, `gh release`, PyPI upload, visibility
+  changes, branch deletion and any write to another repository need explicit confirmation each time
+  - including posting any `docs/upstream/` draft.
 - Generated docs output (`docs/generated/`, `docs/sg_execution_times.rst`) is gitignored;
   `docs/auto_examples/` holds the sources and is tracked.
