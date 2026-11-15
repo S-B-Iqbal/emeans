@@ -1,8 +1,8 @@
 # Active context
 
-**Phase:** 9 - evidence guard, head-to-head, OpenMP numbers, example - **Mode:** ACT (approved)
-**Status:** P9.1/P9.3/P9.4 done on `phase-9-evidence`; P9.2 is committed but its job can only be
-dispatched once the workflow is on the default branch, i.e. after the merge. Gate pending.
+**Phase:** 9 - evidence guard, head-to-head, OpenMP numbers, example - **Mode:** ACT (approved, merged `dc99691`)
+**Status:** Phase 9 **closed** (issue #10 closed).  No phase is running: the next one needs explicit
+approval (proposal below).
 `v0.1.0` is published as a **GitHub release** (D-060); the PyPI upload is blocked on credentials.
 The #35383 comment **is posted** (D-061).
 
@@ -18,9 +18,23 @@ The #35383 comment **is posted** (D-061).
   0.3.2 at `OMP_NUM_THREADS=1`, both resolve `B = 8192`; ours -33.9/-15.5/-13.6 %, theirs
   -36.5/-14.7/-10.1 %; theirs 10-15 % faster. A reproducibility check, **not** a ranking (D-062).
   Written into `parity-matrix.md` and `benchmarks/report.md`.
-- **P9.2** `.github/workflows/benchmark.yml` (manual dispatch, ubuntu, OpenMP, uploads
-  `large-omp.csv`). `gh workflow run` 404s until the file is on `main`; dispatch after the merge
-  and add the numbers to the report.
+- **P9.2** done: the job ran on ubuntu (OpenMP, 4 threads) after the merge, and
+  `benchmarks/results/large-omp.csv` is committed.  All 240 rows reproduce the serial test MSE to
+  4.3e-14; the e-means loop is 1.5-1.8x faster there (Lloyd only 1.0-1.2x; CPU and threading
+  confounded).  A new evidence test guards the agreement claim.
+
+## Proposed Phase 10 (ranked; not started)
+- **P10.1** verify the **published** artefact installs from its GitHub release URL in a clean venv
+  (that URL is quoted in the release notes and has never been exercised).
+- **P10.2** stale-claims refresh: the parity matrix and the contrib request still say "no wheels
+  published yet"; README/CHANGELOG should record v0.1.0, the GitHub-release install path and the
+  head-to-head result.
+- **P10.3** a **real-data benchmark** (opt-in `run_suite.py real`): e.g. `fetch_openml("mnist_784")`
+  -> `TruncatedSVD(96)` (70k x 96), dataset version and fetch date recorded, committed CSV + report
+  rows.  This is the last credibility gap: everything published so far is synthetic.
+- **P10.4** (gated) PyPI upload; (gated) Pages enablement.
+- **P10.5** monitor #35383 (26 comments, ours is the newest, no reply yet at 2026-11-15 06:00Z);
+  draft an answer if a maintainer replies - no posting without a go-ahead.
 
 ## Outstanding decisions
 - **PyPI upload** needs credentials: `~/.pypirc`, or `TWINE_USERNAME=__token__` +

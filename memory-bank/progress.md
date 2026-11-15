@@ -12,7 +12,8 @@
 | 6 Upstream drafts | done | approved phase 6 (user, option B; merged `d7786c8`) |
 | 7 Scale-up, release prep, guide | done | approved phase 7 (user; merged `f7dd3dd`) |
 | 8 Evidence hardening | done | approved phase 8 (user; merged `af69786`) |
-| 9 Evidence guard, head-to-head | done, gate pending | approved phase 9 (user) |
+| 9 Evidence guard, head-to-head | done | approved phase 9 (user; merged `dc99691`) |
+| 10 (proposed) | not started | awaiting approval - see `activeContext.md` |
 
 ## What works
 - P7.0-P7.3: the benchmark now runs **inside the fitted range** (`benchmarks/run_suite.py large`,
