@@ -54,5 +54,12 @@
   on `workflow_dispatch` (useful for validating a fix on a branch without merging).
 - OpenMP: Linux only in practice; macOS (clang, D-044) and Windows (MSVC needs the vcomp DLL,
   D-056) build serial. `emeans._kernels.has_openmp()` reports the truth.
+- **`meson.build` file lists are explicit**: a new module under `emeans/` or `emeans/tests/` must be
+  added to the matching `py.install_sources([...])` list, otherwise `import emeans.tests.<new>`
+  fails after a reinstall (the editable install only maps listed files). Same for new `_kernels`
+  sources.
+- `benchmarks/tests/` holds the runner smoke tests (7 tests, ~2 s); `pytest` with no arguments
+  collects `emeans` + `benchmarks/tests` (pyproject `testpaths`), while the CI wheel jobs keep using
+  `--pyargs emeans`.
 - `docs/upstream/*.md` (Phase 6 drafts) are Markdown and deliberately not linked from
   `docs/index.rst`, so Sphinx builds never pick them up.

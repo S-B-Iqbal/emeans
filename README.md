@@ -79,13 +79,16 @@ are used as intended: `B = 8 192`, `alpha0 = 0.733`):
 
 | dataset | epochs to Lloyd@25 | EMeans@1 | EMeans@5 | worst seed | tuned MiniBatch@5 | EMeans s | MiniBatch s |
 |---|---|---|---|---|---|---|---|
-| blobs-96d | 1.0 (5/5 seeds) | -19.0% | **-33.9%** | -28.5% | -47.3% | 1.5 | 14.0 |
-| blobs-32d | 1.0 (4/5 seeds) | -8.3% | -15.5% | -13.1% | -41.1% | 1.0 | 7.5 |
+| blobs-96d | 1.0 (5/5 seeds) | -19.0% | **-33.9%** | -28.5% | -47.3% | 1.5 | 12.7 |
+| blobs-32d | 1.0 (4/5 seeds) | -8.3% | -15.5% | -13.1% | -41.1% | 1.0 | 7.1 |
+| aniso-96d (stress) | 1.0 (5/5 seeds) | -9.7% | -13.6% | -7.7% | -55.0% | 1.4 | 11.2 |
 
 e-means reaches the Lloyd@25 test MSE in **one epoch** here (the paper reports 1.4-2.6), is
-**faster** than Lloyd@25 (1.5 s vs 2.3 s at `d = 96`), and dimension still drives the win.  It
-still loses to a validation-tuned MiniBatchKMeans on test MSE at equal epochs, and at `d = 32` it
-loses at equal time as well; at `d = 96` it matches MiniBatch@1's quality in 2.7x less time.
+**faster** than Lloyd@25 (1.5 s vs 2.0 s at `d = 96`), and dimension still drives the win.  It
+still loses to a validation-tuned MiniBatchKMeans on test MSE at equal epochs in all three
+datasets, and at equal time in two of them.  **Revival is what makes it beat Lloyd at all**:
+switching it off leaves e-means within ~2% of Lloyd@25 (`+2.2%`, `+1.8%`, `+0.8%` after five
+epochs) instead of 13.6-33.9% below it.
 
 **Below the fitted range** (the original `n_train = 10 000` suite, kept for continuity):
 

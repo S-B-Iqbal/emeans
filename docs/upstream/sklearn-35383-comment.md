@@ -8,52 +8,58 @@ words. Post only after the user's explicit go-ahead.
 ## Ready-to-paste text
 
 ```text
-Independent data point for this discussion — not a competing proposal.
+Independent data point for this discussion - not a competing proposal.
 
-While following this issue I wrote an independent implementation of e-means from the paper
+I wrote an independent implementation of e-means from the paper
 (BSD-3, import `emeans`, source: github.com/S-B-Iqbal/emeans) and benchmarked it honestly on one
-laptop. Caveat first: Apple M2 with *serial* kernels (no -fopenmp on Apple clang), so compare
-epochs, not seconds. n_train = 10 000, median of 5 seeds, metric = (MSE - MSE_Lloyd@25)/MSE:
+laptop. Caveats first: Apple M2 with *serial* kernels (no -fopenmp on Apple clang), so compare
+epochs rather than seconds; synthetic Gaussian blobs; n_train = 100 000 with k = 512, inside the
+range the paper's scaling laws were fitted on (B = 8192, alpha0 = 0.733). Metric =
+(MSE - MSE_Lloyd@25)/MSE_Lloyd@25, median of 5 seeds, both methods at equal epoch budgets:
 
-| dataset | k | d | epochs to Lloyd@25 | EMeans@5 vs Lloyd | worst seed | tuned MiniBatchKMeans |
-|---|---|---|---|---|---|---|
-| blobs | 512 | 32 | 2.4 | -3.2 % | -1.3 % | -19.1 % |
-| blobs | 512 | 96 | 3.0 | -19.8 % | -10.7 % | -28.9 % |
-| high n/k = 1000 | 20 | 16 | 1.0 | +0.0 % | +46.0 % | -47.7 % |
-| low-d | 32 | 2 | 4.0 | -2.5 % | -0.1 % | +16.7 % |
+| dataset | epochs to Lloyd@25 | EMeans@1 | EMeans@5 | worst seed | MiniBatch@5 (tuned) |
+|---|---|---|---|---|---|
+| d = 96 | 1.0 (5/5 seeds) | -19.0 % | -33.9 % | -28.5 % | -47.3 % |
+| d = 32 | 1.0 (4/5 seeds) | -8.3 % | -15.5 % | -13.1 % | -41.1 % |
 
-Two honest readings:
+Three readings:
 
-1. The epochs claim reproduces at this scale (paper Table 4: 1.4-2.6), and dimension is what
-   matters — at d = 96 five epochs end ~20 % below Lloyd@25, at d = 2 only 2.5 %. That matches
-   the regime you described above, embeddings with d ~ 30-250 and many clusters, which may be
-   the most useful thing to document in an example.
-2. A validation-swept MiniBatchKMeans still beats this e-means on 3 of 4 configurations at
-   this size, and e-means costs about 2x Lloyd@25 in wall-clock here. So the strong case is not
-   "add another estimator" but landing the transferable parts in MiniBatchKMeans (cosine-
-   annealed step with a floor, last-epoch-mean finalization so `fit(X).labels_ == predict(X)` for
-   free, automatic batch size / peak step, split-based revival instead of random reassignment)
-   as the `algorithm="e-means"` route @glevv suggested.
+1. The epochs claim reproduces here: one epoch reaches the Lloyd@25 test MSE, against 1.4-2.6 in
+   Table 4. We needed 2-4 epochs at n_train = 10 000, so the automatic batch size and step do
+   matter as the laws intend. At d = 96 e-means is also faster than Lloyd@25 (1.5 s vs 2.3 s).
+2. The win is dimension-dependent, which matches the embedding regime described above (d ~ 30-250):
+   -15.5 % at d = 32 against -33.9 % at d = 96.
+3. A validation-tuned MiniBatchKMeans still wins on test MSE at every equal-epoch budget here, as
+   it did at n_train = 10 000. So the strongest case is not "add another estimator" but landing
+   the transferable parts in MiniBatchKMeans (cosine-annealed step with a floor; last-epoch-mean
+   finalization, which gives `fit(X).labels_ == predict(X)` for free; automatic batch size and peak
+   step; split-based revival instead of random reassignment) as the `algorithm="e-means"` route
+   @glevv suggested.
 
-Everything is reproducible: protocol, CSV and plots (losses included, no tuning of e-means)
-in the repo's `benchmarks/report.md`; parity with the existing prototypes by @cakedev0 and
-@maxmbay in `docs/upstream/parity-matrix.md`. Our implementation differs by supporting
-`sample_weight` and streaming `partial_fit` — happy to upstream either to whichever package
-maintainers prefer, rather than duplicate effort.
+Protocol, CSV, plots and every losing case: `benchmarks/report.md`. Parity with the existing
+prototypes (thanks @cakedev0, @maxmbay): `docs/upstream/parity-matrix.md`. Our implementation
+differs by supporting `sample_weight` and streaming `partial_fit` - happy to upstream either to
+whichever package maintainers prefer rather than duplicate effort.
 ```
 
-## Facts checked before posting (2026-11-14)
+## Facts checked before posting (refreshed 2026-11-14, P8.1)
 
 | Claim | Source |
 |---|---|
-| epochs to Lloyd@25: 2.4 / 3.0 / 1.0 / 4.0 (median of 5 seeds) | `benchmarks/results/suite.csv`, summarised in `benchmarks/report.md` |
-| EMeans@5 vs Lloyd@25: −3.2 % / −19.8 % / +0.0 % / −2.5 %; worst seeds −1.3 % / −10.7 % / +46.0 % / −0.1 % | same |
-| tuned MiniBatchKMeans: −19.1 % / −28.9 % / −47.7 % / +16.7 % (best on validation, reported on test) | same; protocol in rule 09 and `benchmarks/report.md` |
-| wall-clock ≈ 2× Lloyd@25 | 0.19 s vs 0.07 s and 0.29 s vs 0.11 s in the report table (serial build) |
-| paper Table 4: 1.4–2.6 epochs | `docs/PAPER_NOTES.md` |
+| epochs to Lloyd@25: 1.0 at d = 96 (5/5 seeds) and 1.0 at d = 32 (4/5, one seed at 4) | `benchmarks/results/large.csv`, summarised in `benchmarks/report.md` |
+| EMeans@1 / @5 vs Lloyd@25: −19.0 % / −33.9 % (d = 96) and −8.3 % / −15.5 % (d = 32); worst seeds −28.5 % and −13.1 % | same (`n_train = 100 000`, `k = 512`, median of 5 seeds) |
+| tuned MiniBatchKMeans@5: −47.3 % (d = 96, 14.0 s) and −41.1 % (d = 32, 7.5 s), best on validation, reported on test | same; protocol in rule 09 and `benchmarks/report.md` |
+| e-means faster than Lloyd@25 at d = 96: 1.5 s vs 2.3 s (and 0.66 s at 1 epoch) | same table, serial build |
+| `B = 8 192`, `alpha0 = 0.733` at `n = 100 000`, `k = 512`, `T = 5` | `emeans/scaling_laws.auto_hyperparameters`; quoted in `report.md` |
+| paper Table 4: 1.4–2.6 epochs; Table 10: 1.0–3.0 at `n/k = 1000` | `docs/PAPER_NOTES.md` |
 | serial build reality | `benchmarks/report.md` environment block; D-044 (macOS), D-056 (Windows) |
 | `sample_weight` / `partial_fit` absent from `sklearn-contrib-emeans` 0.3.1 | PyPI project description, fetched 2026-11-14 (`docs/upstream/parity-matrix.md`) |
 | `glevv`'s `algorithm="e-means"` suggestion, `betatim`'s embedding regime, `cakedev0`/`maxmbay` prototypes | issue comments 2026-11-12/13, read 2026-11-14 |
+
+The earlier `n_train = 10 000` numbers (2.4–3.0 epochs, −19.8 % at `d = 96`, ~2x slower than
+Lloyd@25) are still in `benchmarks/report.md` under "Results below the fitted range"; they are no
+longer quoted in the comment, because the in-range run supersedes them and contradicts the
+wall-clock claim.
 
 Not claimed anywhere: that e-means is a new algorithm, that our package is faster than the other
 implementation, or any speedup number from the paper (their 9–15× came from 64-core Xeon with

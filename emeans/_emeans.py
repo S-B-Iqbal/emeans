@@ -92,6 +92,8 @@ class EMeans(
         ``tau`` times the mean count.
     revival_period : int, default=5
         Revive dead clusters every this many EMA updates (Alg. 1, line 9).
+        Set it larger than the number of updates (``n_steps_``) to switch
+        revival off, which is the ablation reported in the benchmark suite.
     finalization : {"last_epoch_mean", "slow_ema"} or None, default="last_epoch_mean"
         How the final centroids are built (Sec. 3.2): the mean of the rows
         assigned in the last epoch, a slow EMA that is never used for
@@ -119,6 +121,11 @@ class EMeans(
     n_steps_ : int
         EMA updates performed: ``T * ceil(n_samples / batch_size)`` after
         ``fit``, one per ``partial_fit`` call.
+    n_revivals_ : int
+        Number of clusters revived by splitting a donor (App. H.1) during the
+        fit or across ``partial_fit`` calls.  ``revival_period`` can be set
+        larger than the number of steps to switch revival off, which makes this
+        attribute a cheap ablation switch.
     batch_size_ : int
         Resolved batch size.
     alpha0_ : float
@@ -316,6 +323,7 @@ class EMeans(
             last_labels = np.empty(n_samples, dtype=np.int32)
         step = peak
         t = 0
+        total_revived = 0
         for epoch in range(self.n_epochs):
             order = random_state.permutation(n_samples)
             epoch_inertia = 0.0
@@ -358,6 +366,7 @@ class EMeans(
                     if use_slow:
                         states.append((slow_counts, slow_sums))
                     revived += revive(states, random_state, self.revival_threshold)
+            total_revived += revived
             if self.verbose:
                 print(
                     f"Epoch {epoch + 1}/{self.n_epochs}: steps {t}/{total_steps}, "
@@ -370,6 +379,7 @@ class EMeans(
         self._slow_sums = slow_sums
         self._last_epoch_labels = last_labels
         self.n_steps_ = t
+        self.n_revivals_ = total_revived
 
     def _final_centroids(self, X, sample_weight):
         """Final centroids for the selected finalization (Sec. 3.2)."""
@@ -585,6 +595,7 @@ class EMeans(
             self._sums = self._counts[:, None] * centers
             self.n_steps_ = 0
             self.n_iter_ = 0
+            self.n_revivals_ = 0
         else:
             self.n_steps_ = getattr(self, "n_steps_", 0)
             if not hasattr(self, "_partial_fit_step"):
@@ -601,7 +612,7 @@ class EMeans(
         self._sums += step * batch_sums
         self.n_steps_ += 1
         if self.n_steps_ % self.revival_period == 0:
-            revive(
+            self.n_revivals_ += revive(
                 [(self._counts, self._sums)],
                 self._random_state,
                 self.revival_threshold,

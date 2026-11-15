@@ -29,6 +29,30 @@ def make_high_n_over_k(n_samples, n_clusters, seed=0):
     return make_blobs(n_samples, n_features=16, n_clusters=n_clusters, seed=seed)
 
 
+def make_anisotropic(
+    n_samples, n_features=96, n_clusters=512, seed=0, max_stretch=8.0, pareto=1.5
+):
+    """Elongated clusters with a Zipf-like size distribution (P8.6).
+
+    Real embedding sets are neither isotropic nor balanced, so this is the stress case
+    for the batch-size law and for the revival mechanism (App. H.2, Table 14): each
+    cluster is stretched along a random direction by up to ``max_stretch``, and cluster
+    sizes follow a Pareto distribution, so most points sit in a few clusters and many
+    clusters are close to empty.
+    """
+    rng = np.random.RandomState(seed)
+    centres = rng.normal(size=(n_clusters, n_features)) * 3.0
+    weights = rng.pareto(pareto, size=n_clusters) + 0.01
+    rows = rng.choice(n_clusters, size=n_samples, p=weights / weights.sum())
+    directions = rng.normal(size=(n_clusters, n_features))
+    directions /= np.linalg.norm(directions, axis=1, keepdims=True)
+    stretch = rng.uniform(1.0, max_stretch, size=(n_clusters, 1))
+    noise = 0.5 * rng.normal(size=(n_samples, n_features))
+    along = (noise * directions[rows]).sum(axis=1, keepdims=True)
+    noise += along * directions[rows] * (stretch[rows] - 1.0)
+    return centres[rows] + noise
+
+
 def held_out_split(X, seed=0, max_heldout=MAX_HELDOUT):
     """Return (train, validation, test) with a deduplicated held-out set."""
     rng = np.random.RandomState(seed)

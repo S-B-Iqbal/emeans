@@ -9,6 +9,7 @@ py.install_sources(
     'test_numpy_backend.py',
     'test_partial_fit.py',
     'test_revival.py',
+    'test_revival_accounting.py',
     'test_package.py',
     'test_scaling_laws.py',
     'test_schedule.py',

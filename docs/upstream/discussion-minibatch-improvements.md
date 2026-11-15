@@ -22,23 +22,29 @@ the *step schedule* and the *finalization*, not the estimator.
 | 4 | **Split-based revival** for under-used clusters: split the largest donor along the BF16-epsilon pattern (Eq. 8) instead of re-drawing random samples from the batch | `reassignment_ratio`: `to_reassign = counts < reassignment_ratio * counts.max()`, at most `0.5 · batch_size` clusters, new centres drawn **uniformly at random from the batch** (`_kmeans.py`, `_mini_batch_step`) | new parameter (e.g. `revival="off" | "split"`), default `"off"` |
 
 Proposals 1 and 2 are the ones with measured support; 3 is a convenience whose benefit is
-invisible below ~1e5 rows; 4 addresses dead clusters that `reassignment_ratio` handles poorly on
-skewed data (paper App. H.2, Table 14), but we have not measured it against
-`reassignment_ratio` on sklearn's own benchmarks — that would be part of the PR discussion, not
-something to assert.
+invisible below ~1e5 rows; 4 now also has measured support: with the revival switched off,
+e-means lands **within ~2 % of Lloyd@25** after five epochs (`+2.2 %` at `d = 96`, `+1.8 %` at
+`d = 32`, `+0.8 %` on the skewed stress case) instead of 13.6–33.9 % below it, and most seeds never
+reach the reference budget at all.  We have not compared split revival against
+`reassignment_ratio` head-to-head on sklearn's own benchmarks, so the claim is "the mechanism is
+worth testing", not "this implementation of it is better than yours".
 
 ## Evidence to quote (and its limits)
 
-- Independent implementation, `n_train = 10 000`, median of 5 seeds, test MSE relative to
+- Independent implementation, `n_train = 100 000` (`k = 512`, so `B = 8 192` and `alpha0 = 0.733`
+  are inside the range the laws were fitted on), median of 5 seeds, test MSE relative to
   `KMeans(algorithm="lloyd", init="random", n_init=1, max_iter=25)`:
-  2.4–3.0 epochs to match Lloyd@25 at `d = 32/96`, **−19.8 %** at `d = 96` after 5 epochs;
-  `+0.0 %` and `+46 %` (worst seed) in the high-`n/k` case.
-- Limits to state: laptop, **serial** kernels (OpenMP only on Linux here), `n` below the range the
-  laws were fitted on, and a tuned `MiniBatchKMeans` still wins on 3 of our 4 configurations at
-  that size.
+  **one epoch** reaches the Lloyd@25 test MSE in 9 of 10 runs (paper: 1.4–2.6 epochs);
+  at `d = 96` five epochs end **−33.9 %** below it and cost 1.5 s against Lloyd@25's 2.3 s;
+  at `d = 32` the same budget gives −15.5 %.
+- Limits to state: laptop, **serial** kernels (OpenMP only on Linux here); synthetic Gaussian
+  blobs; and a validation-tuned `MiniBatchKMeans` still wins on test MSE at every equal-epoch
+  budget (−47.3 % at 5 epochs, `d = 96`, but 14.0 s against our 1.5 s), while at `d = 32` it wins
+  at equal time as well.  The earlier `n_train = 10 000` run (`benchmarks/report.md`, "Results
+  below the fitted range") said e-means was 2x slower than Lloyd@25; that did not generalise.
 - Therefore the honest pitch is: *annealing + last-epoch-mean raise the floor of a widely used
-  estimator; the auto laws are only worth adding if the maintainers want the "no tuning" story
-  for large `n`.*
+  estimator, and the automatic laws make the "no tuning" story work at 100 000 points and above;
+  below that they are extrapolations.*
 
 ## Questions for maintainers
 
